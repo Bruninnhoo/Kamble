@@ -1,0 +1,227 @@
+import type { Metadata } from 'next'
+import Link from 'next/link'
+
+export const metadata: Metadata = {
+  title: 'Dashboard',
+  description: 'Sua área de estudos no Kamble',
+}
+
+// Mock data — será substituído por dados da API
+const upcomingClasses = [
+  {
+    id: '1',
+    name: 'Inglês B1 — Turma Manhã',
+    teacher: 'Prof. Carlos Oliveira',
+    scheduledAt: '2026-06-05T09:00:00',
+    level: 'B1',
+  },
+  {
+    id: '2',
+    name: 'Conversação Avançada',
+    teacher: 'Prof. Sarah Miller',
+    scheduledAt: '2026-06-07T14:00:00',
+    level: 'C1',
+  },
+]
+
+const pendingAssignments = [
+  {
+    id: '1',
+    title: 'Reading Comprehension — Unit 5',
+    className: 'Inglês B1 — Turma Manhã',
+    dueDate: '2026-06-06',
+  },
+  {
+    id: '2',
+    title: 'Essay: My Daily Routine',
+    className: 'Inglês B1 — Turma Manhã',
+    dueDate: '2026-06-10',
+  },
+]
+
+const stats = [
+  { label: 'Aulas assistidas', value: '24', icon: '🎥' },
+  { label: 'Tarefas entregues', value: '18', icon: '✅' },
+  { label: 'Horas estudadas', value: '36h', icon: '⏱️' },
+  { label: 'Nível atual', value: 'B1', icon: '📊' },
+]
+
+function formatDate(iso: string) {
+  return new Date(iso).toLocaleDateString('pt-BR', {
+    weekday: 'short',
+    day: '2-digit',
+    month: 'short',
+    hour: '2-digit',
+    minute: '2-digit',
+  })
+}
+
+function daysUntil(dateStr: string) {
+  const diff = new Date(dateStr).getTime() - Date.now()
+  const days = Math.ceil(diff / (1000 * 60 * 60 * 24))
+  if (days === 0) return 'Hoje'
+  if (days === 1) return 'Amanhã'
+  return `em ${days} dias`
+}
+
+export default function StudentDashboard() {
+  return (
+    <div className="min-h-screen bg-[#09090b]">
+      {/* ── Sidebar ──────────────────────────────────────── */}
+      <div className="fixed inset-y-0 left-0 w-64 glass border-r border-white/5 flex flex-col z-40">
+        <div className="p-6 border-b border-white/5">
+          <Link href="/" className="flex items-center gap-2">
+            <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-sky-400 to-lime-400 flex items-center justify-center text-black font-bold text-sm">
+              K
+            </div>
+            <span className="font-semibold text-lg">Kamble</span>
+          </Link>
+        </div>
+
+        <nav className="flex-1 p-4 space-y-1">
+          {[
+            { href: '/dashboard/student', label: 'Início', icon: '🏠', active: true },
+            { href: '/dashboard/student/classes', label: 'Minhas Turmas', icon: '📚' },
+            { href: '/dashboard/student/assignments', label: 'Tarefas', icon: '📝' },
+            { href: '/dashboard/student/materials', label: 'Materiais', icon: '📂' },
+            { href: '/dashboard/student/progress', label: 'Progresso', icon: '📈' },
+          ].map((item) => (
+            <Link
+              key={item.href}
+              href={item.href}
+              id={`nav-${item.label.toLowerCase().replace(/\s/g, '-')}`}
+              className={`flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm transition-all duration-200 ${
+                item.active
+                  ? 'bg-sky-500/15 text-sky-400 font-medium'
+                  : 'text-zinc-500 hover:text-zinc-200 hover:bg-white/5'
+              }`}
+            >
+              <span>{item.icon}</span>
+              {item.label}
+            </Link>
+          ))}
+        </nav>
+
+        <div className="p-4 border-t border-white/5">
+          <div className="flex items-center gap-3 px-3 py-2.5">
+            <div className="w-8 h-8 rounded-full bg-gradient-to-br from-sky-400 to-lime-400 flex items-center justify-center text-black font-bold text-xs">
+              J
+            </div>
+            <div className="flex-1 min-w-0">
+              <div className="text-sm font-medium text-zinc-200 truncate">João Silva</div>
+              <div className="text-xs text-zinc-500">Aluno · Nível B1</div>
+            </div>
+          </div>
+          <Link
+            href="/auth/login"
+            id="sidebar-logout-btn"
+            className="mt-2 flex items-center gap-3 px-3 py-2 rounded-xl text-sm text-zinc-600 hover:text-red-400 hover:bg-red-400/5 transition-all w-full"
+          >
+            <span>🚪</span> Sair
+          </Link>
+        </div>
+      </div>
+
+      {/* ── Main content ─────────────────────────────────── */}
+      <main className="ml-64 p-8">
+        {/* Header */}
+        <div className="mb-8">
+          <h1 className="text-2xl font-bold mb-1">Bom dia, João! 👋</h1>
+          <p className="text-zinc-500 text-sm">Aqui está o resumo das suas aulas e tarefas.</p>
+        </div>
+
+        {/* Stats */}
+        <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
+          {stats.map((stat) => (
+            <div key={stat.label} className="glass rounded-2xl p-5">
+              <div className="text-2xl mb-2">{stat.icon}</div>
+              <div className="text-2xl font-bold gradient-text mb-1">{stat.value}</div>
+              <div className="text-xs text-zinc-500">{stat.label}</div>
+            </div>
+          ))}
+        </div>
+
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+          {/* Upcoming classes */}
+          <div className="glass rounded-2xl p-6">
+            <div className="flex items-center justify-between mb-5">
+              <h2 className="font-semibold">Próximas aulas</h2>
+              <Link
+                href="/dashboard/student/classes"
+                id="view-all-classes-link"
+                className="text-xs text-sky-400 hover:text-sky-300 transition-colors"
+              >
+                Ver todas →
+              </Link>
+            </div>
+
+            <div className="space-y-3">
+              {upcomingClasses.map((cls) => (
+                <div
+                  key={cls.id}
+                  className="flex items-center gap-4 p-4 rounded-xl bg-zinc-800/40 hover:bg-zinc-800/70 transition-colors group"
+                >
+                  <div className="w-10 h-10 rounded-xl bg-sky-500/15 flex items-center justify-center text-sky-400 font-bold text-xs shrink-0">
+                    {cls.level}
+                  </div>
+                  <div className="flex-1 min-w-0">
+                    <div className="text-sm font-medium text-zinc-200 truncate">{cls.name}</div>
+                    <div className="text-xs text-zinc-500">{cls.teacher}</div>
+                    <div className="text-xs text-zinc-600 mt-0.5">{formatDate(cls.scheduledAt)}</div>
+                  </div>
+                  <Link
+                    href={`/classes/${cls.id}/live`}
+                    id={`join-class-${cls.id}-btn`}
+                    className="shrink-0 text-xs bg-sky-500/15 text-sky-400 hover:bg-sky-500 hover:text-white px-3 py-1.5 rounded-lg transition-all duration-200 opacity-0 group-hover:opacity-100"
+                  >
+                    Entrar
+                  </Link>
+                </div>
+              ))}
+            </div>
+          </div>
+
+          {/* Pending assignments */}
+          <div className="glass rounded-2xl p-6">
+            <div className="flex items-center justify-between mb-5">
+              <h2 className="font-semibold">Tarefas pendentes</h2>
+              <Link
+                href="/dashboard/student/assignments"
+                id="view-all-assignments-link"
+                className="text-xs text-sky-400 hover:text-sky-300 transition-colors"
+              >
+                Ver todas →
+              </Link>
+            </div>
+
+            <div className="space-y-3">
+              {pendingAssignments.map((task) => (
+                <div
+                  key={task.id}
+                  className="p-4 rounded-xl bg-zinc-800/40 hover:bg-zinc-800/70 transition-colors"
+                >
+                  <div className="flex items-start justify-between gap-3">
+                    <div className="flex-1 min-w-0">
+                      <div className="text-sm font-medium text-zinc-200">{task.title}</div>
+                      <div className="text-xs text-zinc-500 mt-0.5">{task.className}</div>
+                    </div>
+                    <span className="shrink-0 text-xs text-amber-400 bg-amber-400/10 px-2 py-1 rounded-md font-medium">
+                      {daysUntil(task.dueDate)}
+                    </span>
+                  </div>
+                  <Link
+                    href={`/assignments/${task.id}`}
+                    id={`open-assignment-${task.id}-btn`}
+                    className="mt-3 text-xs text-zinc-500 hover:text-sky-400 transition-colors inline-block"
+                  >
+                    Abrir tarefa →
+                  </Link>
+                </div>
+              ))}
+            </div>
+          </div>
+        </div>
+      </main>
+    </div>
+  )
+}
