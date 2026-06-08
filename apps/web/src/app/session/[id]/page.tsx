@@ -128,11 +128,10 @@ function ChatPanel({
             className={`flex flex-col gap-0.5 ${msg.userId === userId ? 'items-end' : 'items-start'}`}
           >
             <div
-              className={`max-w-[85%] px-3 py-2 rounded-2xl text-sm ${
-                msg.userId === userId
+              className={`max-w-[85%] px-3 py-2 rounded-2xl text-sm ${msg.userId === userId
                   ? 'bg-lime-500/20 text-lime-100 rounded-br-sm'
                   : 'bg-zinc-800/80 text-zinc-200 rounded-bl-sm'
-              }`}
+                }`}
             >
               {msg.message}
             </div>
@@ -188,7 +187,7 @@ export default function SessionRoomPage() {
     if (typeof window !== 'undefined') {
       const token = localStorage.getItem('kamble_access_token') ?? ''
       const storedUserId = localStorage.getItem('kamble_user_id') ?? 'demo-user'
-      const storedRole = localStorage.getItem('kamble_user_role') ?? 'STUDENT'
+      const storedRole = localStorage.getItem('kamble_user_role') ?? 'TEACHER'
       setAuthToken(token)
       setUserId(storedUserId)
       setRole(storedRole)
@@ -214,12 +213,7 @@ export default function SessionRoomPage() {
     sendChatMessage,
     startSession,
     endSession,
-  } = useWebRTC(
-    socket
-      ? { socket, sessionId, userId, role }
-      : // Fallback - won't be used if no socket
-        ({ socket: null as any, sessionId, userId, role } as any),
-  )
+  } = useWebRTC({ socket, sessionId, userId, role })
 
   // ── Join room flow ────────────────────────────────────────────────────────
 
@@ -363,15 +357,14 @@ export default function SessionRoomPage() {
         <div className="flex-1 flex flex-col p-4 gap-4 overflow-hidden">
           {/* Main video area */}
           <div
-            className={`flex-1 grid gap-3 ${
-              peersArray.length === 0
+            className={`flex-1 grid gap-3 ${peersArray.length === 0
                 ? 'grid-cols-1'
                 : peersArray.length === 1
                   ? 'grid-cols-2'
                   : peersArray.length <= 3
                     ? 'grid-cols-2'
                     : 'grid-cols-3'
-            }`}
+              }`}
           >
             {/* Local video */}
             <VideoTile

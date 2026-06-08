@@ -75,6 +75,79 @@ export function getRefreshToken(): string | null {
   return typeof window !== 'undefined' ? localStorage.getItem('kamble_refresh_token') : null
 }
 
+// ── Tipos de turmas ────────────────────────────────────────────────────────
+
+export type EnglishLevel = 'A1' | 'A2' | 'B1' | 'B2' | 'C1' | 'C2'
+
+export interface ClassData {
+  id: string
+  name: string
+  teacherId: string
+  level: EnglishLevel
+  maxStudents: number
+  status: string
+  createdAt: string
+  studentsCount?: number
+  teacherName?: string
+}
+
+export interface CreateClassPayload {
+  name: string
+  level: EnglishLevel
+  maxStudents?: number
+}
+
+// ── Helper autenticado ─────────────────────────────────────────────────────
+
+async function authGet<T>(path: string): Promise<T> {
+  const token = getAccessToken()
+  const res = await fetch(`${BASE}${path}`, {
+    headers: token ? { Authorization: `Bearer ${token}` } : {},
+  })
+  const data = await res.json()
+  if (!res.ok) {
+    const err = data as ApiError
+    const msg = Array.isArray(err.message) ? err.message[0] : err.message
+    throw new Error(msg ?? 'Erro inesperado')
+  }
+  return data as T
+}
+
+async function authPost<T>(path: string, body: unknown): Promise<T> {
+  const token = getAccessToken()
+  const res = await fetch(`${BASE}${path}`, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      ...(token ? { Authorization: `Bearer ${token}` } : {}),
+    },
+    body: JSON.stringify(body),
+  })
+  const data = await res.json()
+  if (!res.ok) {
+    const err = data as ApiError
+    const msg = Array.isArray(err.message) ? err.message[0] : err.message
+    throw new Error(msg ?? 'Erro inesperado')
+  }
+  return data as T
+}
+
+// ── Endpoints de turmas ────────────────────────────────────────────────────
+
+export const classesApi = {
+  create: (payload: CreateClassPayload) =>
+    authPost<ClassData>('/api/v1/classes', payload),
+
+  myClasses: () =>
+    authGet<ClassData[]>('/api/v1/classes/my'),
+
+  enrolledClasses: () =>
+    authGet<ClassData[]>('/api/v1/classes/enrolled'),
+
+  findById: (id: string) =>
+    authGet<ClassData>(`/api/v1/classes/${id}`),
+}
+
 // ── Endpoints de autenticação ──────────────────────────────────────────────
 
 export const authApi = {

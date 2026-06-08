@@ -25,7 +25,7 @@ export interface ChatMessage {
 }
 
 interface UseWebRTCOptions {
-  socket: Socket
+  socket: Socket | null
   sessionId: string
   userId: string
   role: string
@@ -95,7 +95,7 @@ export function useWebRTC({ socket, sessionId, userId, role }: UseWebRTCOptions)
       // ICE candidates
       pc.onicecandidate = (event) => {
         if (event.candidate) {
-          socket.emit('ice-candidate', {
+          socket?.emit('ice-candidate', {
             sessionId,
             to: peerId,
             signal: event.candidate,
@@ -122,7 +122,7 @@ export function useWebRTC({ socket, sessionId, userId, role }: UseWebRTCOptions)
       const pc = createPeerConnection(peerId)
       const offer = await pc.createOffer()
       await pc.setLocalDescription(offer)
-      socket.emit('offer', { sessionId, to: peerId, signal: offer })
+      socket?.emit('offer', { sessionId, to: peerId, signal: offer })
     },
     [createPeerConnection, socket, sessionId],
   )
@@ -133,7 +133,7 @@ export function useWebRTC({ socket, sessionId, userId, role }: UseWebRTCOptions)
       await pc.setRemoteDescription(new RTCSessionDescription(signal))
       const answer = await pc.createAnswer()
       await pc.setLocalDescription(answer)
-      socket.emit('answer', { sessionId, to: from, signal: answer })
+      socket?.emit('answer', { sessionId, to: from, signal: answer })
     },
     [createPeerConnection, socket, sessionId],
   )
@@ -157,6 +157,8 @@ export function useWebRTC({ socket, sessionId, userId, role }: UseWebRTCOptions)
   // ── Socket events ─────────────────────────────────────────────────────────
 
   useEffect(() => {
+    if (!socket) return
+
     const handleRoomPeers = ({ peers: existingPeers }: { peers: string[] }) => {
       existingPeers.forEach((peerId) => callPeer(peerId))
     }
@@ -203,7 +205,7 @@ export function useWebRTC({ socket, sessionId, userId, role }: UseWebRTCOptions)
       socket.off('session-live', handleSessionLive)
       socket.off('session-finished', handleSessionFinished)
     }
-  }, [socket, callPeer, handleOffer, handleAnswer, handleIceCandidate])
+  }, [socket, callPeer, handleOffer, handleAnswer, handleIceCandidate]) // eslint-disable-line react-hooks/exhaustive-deps
 
   // ── Controls ──────────────────────────────────────────────────────────────
 
@@ -271,17 +273,17 @@ export function useWebRTC({ socket, sessionId, userId, role }: UseWebRTCOptions)
 
   const sendChatMessage = useCallback(
     (message: string) => {
-      socket.emit('chat-message', { sessionId, message })
+      socket?.emit('chat-message', { sessionId, message })
     },
     [socket, sessionId],
   )
 
   const startSession = useCallback(() => {
-    socket.emit('session-started', { sessionId })
+    socket?.emit('session-started', { sessionId })
   }, [socket, sessionId])
 
   const endSession = useCallback(() => {
-    socket.emit('session-ended', { sessionId })
+    socket?.emit('session-ended', { sessionId })
   }, [socket, sessionId])
 
   // ── Cleanup ───────────────────────────────────────────────────────────────

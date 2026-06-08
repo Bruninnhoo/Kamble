@@ -3,65 +3,7 @@
 import Link from 'next/link'
 import { useRouter } from 'next/navigation'
 import { useEffect, useState } from 'react'
-import { clearSession } from '@/lib/api'
-
-// Mock data — será substituído por dados da API
-const upcomingClasses = [
-  {
-    id: '1',
-    name: 'Inglês B1 — Turma Manhã',
-    teacher: 'Prof. Carlos Oliveira',
-    scheduledAt: '2026-06-05T09:00:00',
-    level: 'B1',
-  },
-  {
-    id: '2',
-    name: 'Conversação Avançada',
-    teacher: 'Prof. Sarah Miller',
-    scheduledAt: '2026-06-07T14:00:00',
-    level: 'C1',
-  },
-]
-
-const pendingAssignments = [
-  {
-    id: '1',
-    title: 'Reading Comprehension — Unit 5',
-    className: 'Inglês B1 — Turma Manhã',
-    dueDate: '2026-06-06',
-  },
-  {
-    id: '2',
-    title: 'Essay: My Daily Routine',
-    className: 'Inglês B1 — Turma Manhã',
-    dueDate: '2026-06-10',
-  },
-]
-
-const stats = [
-  { label: 'Aulas assistidas', value: '24', icon: '🎥' },
-  { label: 'Tarefas entregues', value: '18', icon: '✅' },
-  { label: 'Horas estudadas', value: '36h', icon: '⏱️' },
-  { label: 'Nível atual', value: 'B1', icon: '📊' },
-]
-
-function formatDate(iso: string) {
-  return new Date(iso).toLocaleDateString('pt-BR', {
-    weekday: 'short',
-    day: '2-digit',
-    month: 'short',
-    hour: '2-digit',
-    minute: '2-digit',
-  })
-}
-
-function daysUntil(dateStr: string) {
-  const diff = new Date(dateStr).getTime() - Date.now()
-  const days = Math.ceil(diff / (1000 * 60 * 60 * 24))
-  if (days === 0) return 'Hoje'
-  if (days === 1) return 'Amanhã'
-  return `em ${days} dias`
-}
+import { clearSession, classesApi, ClassData } from '@/lib/api'
 
 function getGreeting() {
   const hour = new Date().getHours()
@@ -73,6 +15,8 @@ function getGreeting() {
 export default function StudentDashboard() {
   const router = useRouter()
   const [userName, setUserName] = useState('')
+  const [classes, setClasses] = useState<ClassData[]>([])
+  const [loading, setLoading] = useState(true)
 
   useEffect(() => {
     const name = localStorage.getItem('kamble_user_name')
@@ -84,6 +28,11 @@ export default function StudentDashboard() {
     }
 
     setUserName(name)
+
+    classesApi.enrolledClasses()
+      .then(setClasses)
+      .catch(() => setClasses([]))
+      .finally(() => setLoading(false))
   }, [router])
 
   async function handleLogout() {
@@ -93,6 +42,13 @@ export default function StudentDashboard() {
 
   const firstName = userName.split(' ')[0]
   const initial = userName.charAt(0).toUpperCase()
+
+  const stats = [
+    { label: 'Turmas matriculadas', value: String(classes.length), icon: '📚' },
+    { label: 'Tarefas entregues', value: '—', icon: '✅' },
+    { label: 'Horas estudadas', value: '—', icon: '⏱️' },
+    { label: 'Nível atual', value: classes[0]?.level ?? '—', icon: '📊' },
+  ]
 
   return (
     <div className="min-h-screen bg-[#09090b]">
@@ -166,28 +122,42 @@ export default function StudentDashboard() {
           {stats.map((stat) => (
             <div key={stat.label} className="glass rounded-2xl p-5">
               <div className="text-2xl mb-2">{stat.icon}</div>
-              <div className="text-2xl font-bold gradient-text mb-1">{stat.value}</div>
+              <div className="text-2xl font-bold gradient-text mb-1">
+                {loading ? '—' : stat.value}
+              </div>
               <div className="text-xs text-zinc-500">{stat.label}</div>
             </div>
           ))}
         </div>
 
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-          {/* Upcoming classes */}
-          <div className="glass rounded-2xl p-6">
-            <div className="flex items-center justify-between mb-5">
-              <h2 className="font-semibold">Próximas aulas</h2>
-              <Link
-                href="/dashboard/student/classes"
-                id="view-all-classes-link"
-                className="text-xs text-sky-400 hover:text-sky-300 transition-colors"
-              >
-                Ver todas →
-              </Link>
-            </div>
+        {/* Classes */}
+        <div className="glass rounded-2xl p-6">
+          <div className="flex items-center justify-between mb-5">
+            <h2 className="font-semibold">Minhas turmas</h2>
+            <Link
+              href="/dashboard/student/classes"
+              id="view-all-classes-link"
+              className="text-xs text-sky-400 hover:text-sky-300 transition-colors"
+            >
+              Ver todas →
+            </Link>
+          </div>
 
+          {loading ? (
             <div className="space-y-3">
-              {upcomingClasses.map((cls) => (
+              {[1, 2].map((i) => (
+                <div key={i} className="h-20 rounded-xl bg-zinc-800/40 animate-pulse" />
+              ))}
+            </div>
+          ) : classes.length === 0 ? (
+            <div className="flex flex-col items-center justify-center py-12 text-center">
+              <div className="text-4xl mb-3">🎓</div>
+              <p className="text-zinc-400 font-medium mb-1">Nenhuma turma ainda</p>
+              <p className="text-zinc-600 text-sm">Você ainda não está matriculado em nenhuma turma.</p>
+            </div>
+          ) : (
+            <div className="space-y-3">
+              {classes.map((cls) => (
                 <div
                   key={cls.id}
                   className="flex items-center gap-4 p-4 rounded-xl bg-zinc-800/40 hover:bg-zinc-800/70 transition-colors group"
@@ -197,60 +167,24 @@ export default function StudentDashboard() {
                   </div>
                   <div className="flex-1 min-w-0">
                     <div className="text-sm font-medium text-zinc-200 truncate">{cls.name}</div>
-                    <div className="text-xs text-zinc-500">{cls.teacher}</div>
-                    <div className="text-xs text-zinc-600 mt-0.5">{formatDate(cls.scheduledAt)}</div>
+                    {cls.teacherName && (
+                      <div className="text-xs text-zinc-500">Prof. {cls.teacherName}</div>
+                    )}
+                    <div className="text-xs text-zinc-600 mt-0.5">
+                      {cls.studentsCount ?? 0}/{cls.maxStudents} alunos
+                    </div>
                   </div>
                   <Link
-                    href={`/classes/${cls.id}/live`}
-                    id={`join-class-${cls.id}-btn`}
+                    href={`/classes/${cls.id}`}
+                    id={`view-class-${cls.id}-btn`}
                     className="shrink-0 text-xs bg-sky-500/15 text-sky-400 hover:bg-sky-500 hover:text-white px-3 py-1.5 rounded-lg transition-all duration-200 opacity-0 group-hover:opacity-100"
                   >
-                    Entrar
+                    Ver turma
                   </Link>
                 </div>
               ))}
             </div>
-          </div>
-
-          {/* Pending assignments */}
-          <div className="glass rounded-2xl p-6">
-            <div className="flex items-center justify-between mb-5">
-              <h2 className="font-semibold">Tarefas pendentes</h2>
-              <Link
-                href="/dashboard/student/assignments"
-                id="view-all-assignments-link"
-                className="text-xs text-sky-400 hover:text-sky-300 transition-colors"
-              >
-                Ver todas →
-              </Link>
-            </div>
-
-            <div className="space-y-3">
-              {pendingAssignments.map((task) => (
-                <div
-                  key={task.id}
-                  className="p-4 rounded-xl bg-zinc-800/40 hover:bg-zinc-800/70 transition-colors"
-                >
-                  <div className="flex items-start justify-between gap-3">
-                    <div className="flex-1 min-w-0">
-                      <div className="text-sm font-medium text-zinc-200">{task.title}</div>
-                      <div className="text-xs text-zinc-500 mt-0.5">{task.className}</div>
-                    </div>
-                    <span className="shrink-0 text-xs text-amber-400 bg-amber-400/10 px-2 py-1 rounded-md font-medium">
-                      {daysUntil(task.dueDate)}
-                    </span>
-                  </div>
-                  <Link
-                    href={`/assignments/${task.id}`}
-                    id={`open-assignment-${task.id}-btn`}
-                    className="mt-3 text-xs text-zinc-500 hover:text-sky-400 transition-colors inline-block"
-                  >
-                    Abrir tarefa →
-                  </Link>
-                </div>
-              ))}
-            </div>
-          </div>
+          )}
         </div>
       </main>
     </div>
