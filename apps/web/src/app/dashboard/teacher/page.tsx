@@ -1,10 +1,9 @@
-import type { Metadata } from 'next'
-import Link from 'next/link'
+'use client'
 
-export const metadata: Metadata = {
-  title: 'Dashboard — Professor',
-  description: 'Gerencie suas turmas, aulas e alunos no Kamble',
-}
+import Link from 'next/link'
+import { useRouter } from 'next/navigation'
+import { useEffect, useState } from 'react'
+import { clearSession } from '@/lib/api'
 
 const todayClasses = [
   {
@@ -52,7 +51,37 @@ function timeAgo(iso: string) {
   return `há ${Math.floor(h / 24)}d`
 }
 
+function getGreeting() {
+  const hour = new Date().getHours()
+  if (hour < 12) return 'Bom dia'
+  if (hour < 18) return 'Boa tarde'
+  return 'Boa noite'
+}
+
 export default function TeacherDashboard() {
+  const router = useRouter()
+  const [userName, setUserName] = useState('')
+
+  useEffect(() => {
+    const name = localStorage.getItem('kamble_user_name')
+    const role = localStorage.getItem('kamble_user_role')
+
+    if (!name || role !== 'TEACHER') {
+      router.replace('/auth/login')
+      return
+    }
+
+    setUserName(name)
+  }, [router])
+
+  function handleLogout() {
+    clearSession()
+    router.push('/auth/login')
+  }
+
+  const firstName = userName.split(' ')[0]
+  const initial = userName.charAt(0).toUpperCase()
+
   return (
     <div className="min-h-screen bg-[#09090b]">
       {/* ── Sidebar ──────────────────────────────────────── */}
@@ -79,11 +108,10 @@ export default function TeacherDashboard() {
               key={item.href}
               href={item.href}
               id={`nav-${item.label.toLowerCase().replace(/\s/g, '-')}`}
-              className={`flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm transition-all duration-200 ${
-                item.active
+              className={`flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm transition-all duration-200 ${item.active
                   ? 'bg-lime-500/15 text-lime-400 font-medium'
                   : 'text-zinc-500 hover:text-zinc-200 hover:bg-white/5'
-              }`}
+                }`}
             >
               <span>{item.icon}</span>
               {item.label}
@@ -94,20 +122,20 @@ export default function TeacherDashboard() {
         <div className="p-4 border-t border-white/5">
           <div className="flex items-center gap-3 px-3 py-2.5">
             <div className="w-8 h-8 rounded-full bg-gradient-to-br from-lime-400 to-sky-400 flex items-center justify-center text-black font-bold text-xs">
-              C
+              {initial || '?'}
             </div>
             <div className="flex-1 min-w-0">
-              <div className="text-sm font-medium text-zinc-200 truncate">Carlos Oliveira</div>
-              <div className="text-xs text-zinc-500">Professor · Aprovado</div>
+              <div className="text-sm font-medium text-zinc-200 truncate">{userName || '—'}</div>
+              <div className="text-xs text-zinc-500">Professor</div>
             </div>
           </div>
-          <Link
-            href="/auth/login"
+          <button
+            onClick={handleLogout}
             id="sidebar-logout-btn"
             className="mt-2 flex items-center gap-3 px-3 py-2 rounded-xl text-sm text-zinc-600 hover:text-red-400 hover:bg-red-400/5 transition-all w-full"
           >
             <span>🚪</span> Sair
-          </Link>
+          </button>
         </div>
       </div>
 
@@ -116,7 +144,9 @@ export default function TeacherDashboard() {
         {/* Header */}
         <div className="flex items-center justify-between mb-8">
           <div>
-            <h1 className="text-2xl font-bold mb-1">Olá, Carlos! 👨‍🏫</h1>
+            <h1 className="text-2xl font-bold mb-1">
+              {firstName ? `${getGreeting()}, ${firstName}! 👨‍🏫` : ''}
+            </h1>
             <p className="text-zinc-500 text-sm">Você tem {todayClasses.length} aulas agendadas para hoje.</p>
           </div>
           <Link
