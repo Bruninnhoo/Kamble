@@ -189,6 +189,13 @@ export default function TeacherDashboard() {
                     </div>
                     <div className="flex gap-2 shrink-0">
                       <Link
+                        href={`/dashboard/teacher/classes/${cls.id}/sessions`}
+                        id={`sessions-class-${cls.id}-btn`}
+                        className="text-xs text-lime-500 hover:text-lime-300 px-3 py-1.5 rounded-lg hover:bg-lime-500/10 transition-all duration-200 font-medium"
+                      >
+                        Sessões
+                      </Link>
+                      <Link
                         href={`/classes/${cls.id}`}
                         id={`manage-class-${cls.id}-btn`}
                         className="text-xs text-zinc-600 hover:text-zinc-300 px-3 py-1.5 rounded-lg hover:bg-white/5 transition-all duration-200"

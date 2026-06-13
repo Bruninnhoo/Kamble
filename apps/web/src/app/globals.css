@@ -4,28 +4,23 @@
   /* ── Typography ─────────────────────────────────────── */
   --font-family-sans: var(--font-inter), ui-sans-serif, system-ui, sans-serif;
 
-  /* ── Brand Colors ───────────────────────────────────── */
-  --color-brand-50:  #f0f9ff;
-  --color-brand-100: #e0f3fe;
-  --color-brand-200: #bae7fd;
-  --color-brand-300: #7dd4fc;
-  --color-brand-400: #38bdf8;
-  --color-brand-500: #0ea5e9;
-  --color-brand-600: #0284c7;
-  --color-brand-700: #0369a1;
-  --color-brand-800: #075985;
-  --color-brand-900: #0c4a6e;
+  /* ── Brand Colors (yellow/amber) ────────────────────── */
+  --color-brand-50: #fefce8;
+  --color-brand-100: #fef9c3;
+  --color-brand-200: #fef08a;
+  --color-brand-300: #fde047;
+  --color-brand-400: #facc15;
+  --color-brand-500: #eab308;
+  --color-brand-600: #ca8a04;
+  --color-brand-700: #a16207;
+  --color-brand-800: #854d0e;
+  --color-brand-900: #713f12;
 
   /* ── Surface Colors (dark UI) ───────────────────────── */
   --color-surface-900: #09090b;
   --color-surface-800: #18181b;
   --color-surface-700: #27272a;
   --color-surface-600: #3f3f46;
-
-  /* ── Accent (lime green for CTAs) ───────────────────── */
-  --color-accent-400: #a3e635;
-  --color-accent-500: #84cc16;
-  --color-accent-600: #65a30d;
 
   /* ── Border radius ───────────────────────────────────── */
   --radius-xl: 1rem;
@@ -56,9 +51,20 @@ body {
   border: 1px solid rgba(255, 255, 255, 0.08);
 }
 
+/* ── Navbar: transparente no topo, sólida ao rolar ─────── */
+.navbar-top {
+  background: transparent;
+}
+
+.navbar-solid {
+  background: rgba(9, 9, 11, 0.97);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+  box-shadow: 0 4px 32px rgba(0, 0, 0, 0.6);
+}
+
 /* ── Gradient text utility ───────────────────────────────── */
 .gradient-text {
-  background: linear-gradient(135deg, #38bdf8 0%, #a3e635 100%);
+  background: linear-gradient(135deg, #facc15 0%, #fb923c 100%);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   background-clip: text;
@@ -66,16 +72,18 @@ body {
 
 /* ── Glow effect ─────────────────────────────────────────── */
 .glow-brand {
-  box-shadow: 0 0 40px rgba(14, 165, 233, 0.25);
+  box-shadow: 0 0 40px rgba(234, 179, 8, 0.3);
 }
 
 /* ── Scrollbar styling ───────────────────────────────────── */
 ::-webkit-scrollbar {
   width: 6px;
 }
+
 ::-webkit-scrollbar-track {
   background: var(--color-surface-800);
 }
+
 ::-webkit-scrollbar-thumb {
   background: var(--color-surface-600);
   border-radius: 3px;
@@ -87,6 +95,7 @@ body {
     opacity: 0;
     transform: translateY(24px);
   }
+
   to {
     opacity: 1;
     transform: translateY(0);
@@ -94,13 +103,27 @@ body {
 }
 
 @keyframes float {
-  0%, 100% { transform: translateY(0px); }
-  50%       { transform: translateY(-10px); }
+
+  0%,
+  100% {
+    transform: translateY(0px);
+  }
+
+  50% {
+    transform: translateY(-10px);
+  }
 }
 
 @keyframes pulse-glow {
-  0%, 100% { box-shadow: 0 0 20px rgba(14, 165, 233, 0.3); }
-  50%       { box-shadow: 0 0 60px rgba(14, 165, 233, 0.6); }
+
+  0%,
+  100% {
+    box-shadow: 0 0 20px rgba(234, 179, 8, 0.25);
+  }
+
+  50% {
+    box-shadow: 0 0 60px rgba(234, 179, 8, 0.55);
+  }
 }
 
 .animate-fade-up {
@@ -115,7 +138,18 @@ body {
   animation: pulse-glow 3s ease-in-out infinite;
 }
 
-.delay-100 { animation-delay: 100ms; }
-.delay-200 { animation-delay: 200ms; }
-.delay-300 { animation-delay: 300ms; }
-.delay-400 { animation-delay: 400ms; }
+.delay-100 {
+  animation-delay: 100ms;
+}
+
+.delay-200 {
+  animation-delay: 200ms;
+}
+
+.delay-300 {
+  animation-delay: 300ms;
+}
+
+.delay-400 {
+  animation-delay: 400ms;
+}

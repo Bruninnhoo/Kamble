@@ -148,6 +148,58 @@ export const classesApi = {
     authGet<ClassData>(`/api/v1/classes/${id}`),
 }
 
+// ── Tipos de sessões ───────────────────────────────────────────────────────
+
+export type SessionStatus = 'SCHEDULED' | 'LIVE' | 'ENDED' | 'CANCELLED'
+
+export interface SessionData {
+  id: string
+  classId: string
+  teacherId: string
+  scheduledAt: string
+  startedAt: string | null
+  endedAt: string | null
+  status: SessionStatus
+  recordingUrl: string | null
+  createdAt: string
+}
+
+export interface CreateSessionPayload {
+  classId: string
+  scheduledAt: string // ISO 8601
+}
+
+async function authPatch<T>(path: string): Promise<T> {
+  const token = getAccessToken()
+  const res = await fetch(`${BASE}${path}`, {
+    method: 'PATCH',
+    headers: token ? { Authorization: `Bearer ${token}` } : {},
+  })
+  const data = await res.json()
+  if (!res.ok) {
+    const err = data as ApiError
+    const msg = Array.isArray(err.message) ? err.message[0] : err.message
+    throw new Error(msg ?? 'Erro inesperado')
+  }
+  return data as T
+}
+
+// ── Endpoints de sessões ───────────────────────────────────────────────────
+
+export const sessionsApi = {
+  create: (payload: CreateSessionPayload) =>
+    authPost<SessionData>('/api/v1/sessions', payload),
+
+  byClass: (classId: string) =>
+    authGet<SessionData[]>(`/api/v1/classes/${classId}/sessions`),
+
+  start: (id: string) =>
+    authPatch<SessionData>(`/api/v1/sessions/${id}/start`),
+
+  end: (id: string) =>
+    authPatch<SessionData>(`/api/v1/sessions/${id}/end`),
+}
+
 // ── Endpoints de autenticação ──────────────────────────────────────────────
 
 export const authApi = {

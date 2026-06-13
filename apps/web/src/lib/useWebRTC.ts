@@ -57,7 +57,18 @@ export function useWebRTC({ socket, sessionId, userId, role }: UseWebRTCOptions)
       setLocalStream(stream)
       return stream
     } catch (err) {
-      setError('Não foi possível acessar câmera/microfone. Verifique as permissões.')
+      const domErr = err as DOMException
+      let msg = 'Não foi possível acessar câmera/microfone.'
+      if (domErr?.name === 'NotFoundError') {
+        msg = 'Nenhuma câmera ou microfone encontrado. Conecte um dispositivo e tente novamente.'
+      } else if (domErr?.name === 'NotAllowedError') {
+        msg = 'Permissão negada. Permita o acesso à câmera/microfone nas configurações do navegador.'
+      } else if (domErr?.name === 'NotReadableError') {
+        msg = 'Câmera ou microfone em uso por outro aplicativo. Feche outros apps (Zoom, Teams…) e tente novamente.'
+      } else if (domErr?.name === 'OverconstrainedError') {
+        msg = 'As configurações de vídeo solicitadas não são suportadas pelo seu dispositivo.'
+      }
+      setError(msg)
       console.error('[WebRTC] getUserMedia error:', err)
       return null
     }
