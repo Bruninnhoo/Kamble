@@ -123,6 +123,15 @@ export class SessionsService {
     return isTeacher || isEnrolledStudent
   }
 
+  /** Returns the session's classId if the book belongs to that class, else null. */
+  async bookClassId(sessionId: string, bookId: string): Promise<string | null> {
+    const book = await this.prisma.book.findFirst({
+      where: { id: bookId, class: { sessions: { some: { id: sessionId } } } },
+      select: { classId: true },
+    })
+    return book?.classId ?? null
+  }
+
   // ── Private ───────────────────────────────────────────────────────────────
 
   private async _getSessionForTeacher(sessionId: string, teacherUserId: string) {

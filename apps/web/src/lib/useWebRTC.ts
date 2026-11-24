@@ -43,11 +43,22 @@ export function useWebRTC({ socket, sessionId, userId, role }: UseWebRTCOptions)
 
   const localStreamRef = useRef<MediaStream | null>(null)
   const screenStreamRef = useRef<MediaStream | null>(null)
+  const audioMixRef = useRef<AudioContext | null>(null)
   const peerConnections = useRef<Map<string, RTCPeerConnection>>(new Map())
 
   // ── Media ─────────────────────────────────────────────────────────────────
 
   const startLocalMedia = useCallback(async () => {
+    // Guard: mediaDevices is undefined in insecure contexts (HTTP on non-localhost)
+    if (!navigator.mediaDevices?.getUserMedia) {
+      const msg =
+        'Acesso à câmera/microfone requer uma conexão segura (HTTPS). Por favor, acesse via https:// ou localhost.'
+      setError(msg)
+      console.error('[WebRTC] getUserMedia not available – insecure context or unsupported browser')
+      return null
+    }
+
+    // Attempt 1: full HD + facingMode
     try {
       const stream = await navigator.mediaDevices.getUserMedia({
         video: { width: 1280, height: 720, facingMode: 'user' },
@@ -56,20 +67,58 @@ export function useWebRTC({ socket, sessionId, userId, role }: UseWebRTCOptions)
       localStreamRef.current = stream
       setLocalStream(stream)
       return stream
-    } catch (err) {
-      const domErr = err as DOMException
+    } catch (err1) {
+      const e1 = err1 as DOMException
+      console.warn('[WebRTC] getUserMedia attempt 1 failed:', e1.name, e1.message)
+
+      // Attempt 2: simple video (no facingMode – avoids OverconstrainedError on desktop cams)
+      if (e1.name === 'NotFoundError' || e1.name === 'OverconstrainedError') {
+        try {
+          const stream = await navigator.mediaDevices.getUserMedia({
+            video: true,
+            audio: { echoCancellation: true, noiseSuppression: true },
+          })
+          localStreamRef.current = stream
+          setLocalStream(stream)
+          return stream
+        } catch (err2) {
+          const e2 = err2 as DOMException
+          console.warn('[WebRTC] getUserMedia attempt 2 failed:', e2.name, e2.message)
+
+          // Attempt 3: audio-only (no camera available)
+          if (e2.name === 'NotFoundError') {
+            try {
+              const stream = await navigator.mediaDevices.getUserMedia({
+                video: false,
+                audio: { echoCancellation: true, noiseSuppression: true },
+              })
+              localStreamRef.current = stream
+              setLocalStream(stream)
+              console.warn('[WebRTC] Running audio-only – no camera found')
+              return stream
+            } catch (err3) {
+              const e3 = err3 as DOMException
+              console.error('[WebRTC] getUserMedia attempt 3 (audio-only) failed:', e3)
+            }
+          }
+        }
+      }
+
+      // Map final error to user-friendly message
+      const domErr = e1 as DOMException
       let msg = 'Não foi possível acessar câmera/microfone.'
       if (domErr?.name === 'NotFoundError') {
         msg = 'Nenhuma câmera ou microfone encontrado. Conecte um dispositivo e tente novamente.'
       } else if (domErr?.name === 'NotAllowedError') {
         msg = 'Permissão negada. Permita o acesso à câmera/microfone nas configurações do navegador.'
       } else if (domErr?.name === 'NotReadableError') {
-        msg = 'Câmera ou microfone em uso por outro aplicativo. Feche outros apps (Zoom, Teams…) e tente novamente.'
+        msg =
+          'Câmera ou microfone em uso por outro aplicativo. Feche outros apps (Zoom, Teams…) e tente novamente.'
       } else if (domErr?.name === 'OverconstrainedError') {
         msg = 'As configurações de vídeo solicitadas não são suportadas pelo seu dispositivo.'
       }
       setError(msg)
-      console.error('[WebRTC] getUserMedia error:', err)
+      console.error('[WebRTC] getUserMedia error:', err1)
       return null
     }
   }, [])
@@ -170,8 +219,14 @@ export function useWebRTC({ socket, sessionId, userId, role }: UseWebRTCOptions)
   useEffect(() => {
     if (!socket) return
 
-    const handleRoomPeers = ({ peers: existingPeers }: { peers: string[] }) => {
-      existingPeers.forEach((peerId) => callPeer(peerId))
+    const handleRoomPeers = ({ peers: existingPeers }: { peers: RemotePeer[] }) => {
+      // Register peers before calling, so ontrack finds their entry
+      setPeers((prev) => {
+        const next = new Map(prev)
+        existingPeers.forEach((p) => next.set(p.peerId, p))
+        return next
+      })
+      existingPeers.forEach((p) => callPeer(p.peerId))
     }
 
     const handlePeerJoined = (peer: RemotePeer) => {
@@ -238,49 +293,53 @@ export function useWebRTC({ socket, sessionId, userId, role }: UseWebRTCOptions)
     setIsCameraOff((v) => !v)
   }, [])
 
+  // Swap the outgoing track of one kind on every connection (no renegotiation needed)
+  const replaceOutgoing = useCallback((kind: 'audio' | 'video', track: MediaStreamTrack | undefined) => {
+    if (!track) return
+    peerConnections.current.forEach((pc) => {
+      const sender = pc.getSenders().find((s) => s.track?.kind === kind)
+      if (sender) sender.replaceTrack(track)
+    })
+  }, [])
+
+  const stopScreenShare = useCallback(() => {
+    screenStreamRef.current?.getTracks().forEach((t) => t.stop())
+    screenStreamRef.current = null
+    audioMixRef.current?.close()
+    audioMixRef.current = null
+    replaceOutgoing('video', localStreamRef.current?.getVideoTracks()[0])
+    replaceOutgoing('audio', localStreamRef.current?.getAudioTracks()[0])
+    setIsSharingScreen(false)
+  }, [replaceOutgoing])
+
   const toggleScreenShare = useCallback(async () => {
-    if (isSharingScreen) {
-      // Stop screen share, replace with camera
-      screenStreamRef.current?.getTracks().forEach((t) => t.stop())
-      screenStreamRef.current = null
+    if (isSharingScreen) return stopScreenShare()
+    try {
+      // audio: true lets the teacher tick "share tab audio" (Chrome/Edge desktop only)
+      const screenStream = await navigator.mediaDevices.getDisplayMedia({ video: true, audio: true })
+      screenStreamRef.current = screenStream
+      const screenTrack = screenStream.getVideoTracks()[0]
+      replaceOutgoing('video', screenTrack)
 
-      const cameraTrack = localStreamRef.current?.getVideoTracks()[0]
-      if (cameraTrack) {
-        peerConnections.current.forEach((pc) => {
-          const sender = pc.getSenders().find((s) => s.track?.kind === 'video')
-          if (sender && cameraTrack) sender.replaceTrack(cameraTrack)
-        })
+      // Mix mic + tab audio into one track so students hear both; muting the mic still works
+      const tabAudio = screenStream.getAudioTracks()[0]
+      if (tabAudio) {
+        const ctx = new AudioContext()
+        const dest = ctx.createMediaStreamDestination()
+        ctx.createMediaStreamSource(new MediaStream([tabAudio])).connect(dest)
+        const mic = localStreamRef.current?.getAudioTracks()[0]
+        if (mic) ctx.createMediaStreamSource(new MediaStream([mic])).connect(dest)
+        audioMixRef.current = ctx
+        replaceOutgoing('audio', dest.stream.getAudioTracks()[0])
       }
-      setIsSharingScreen(false)
-    } else {
-      try {
-        const screenStream = await navigator.mediaDevices.getDisplayMedia({ video: true })
-        screenStreamRef.current = screenStream
-        const screenTrack = screenStream.getVideoTracks()[0]
 
-        peerConnections.current.forEach((pc) => {
-          const sender = pc.getSenders().find((s) => s.track?.kind === 'video')
-          if (sender) sender.replaceTrack(screenTrack)
-        })
-
-        // Revert when user stops via browser UI
-        screenTrack.onended = () => {
-          setIsSharingScreen(false)
-          screenStreamRef.current = null
-          const cameraTrack = localStreamRef.current?.getVideoTracks()[0]
-          if (cameraTrack) {
-            peerConnections.current.forEach((pc) => {
-              const s = pc.getSenders().find((s) => s.track?.kind === 'video')
-              if (s) s.replaceTrack(cameraTrack)
-            })
-          }
-        }
-        setIsSharingScreen(true)
-      } catch {
-        console.warn('[WebRTC] Screen share cancelled or denied')
-      }
+      // Revert when user stops via browser UI
+      screenTrack.onended = stopScreenShare
+      setIsSharingScreen(true)
+    } catch {
+      console.warn('[WebRTC] Screen share cancelled or denied')
     }
-  }, [isSharingScreen])
+  }, [isSharingScreen, stopScreenShare, replaceOutgoing])
 
   const sendChatMessage = useCallback(
     (message: string) => {
@@ -304,6 +363,7 @@ export function useWebRTC({ socket, sessionId, userId, role }: UseWebRTCOptions)
     peerConnections.current.clear()
     stopLocalMedia()
     screenStreamRef.current?.getTracks().forEach((t) => t.stop())
+    audioMixRef.current?.close()
   }, [stopLocalMedia])
 
   return {

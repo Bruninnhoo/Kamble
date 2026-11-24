@@ -1,5 +1,20 @@
-import { Controller, Post, Get, Param, Body, UseGuards } from '@nestjs/common'
-import { ApiTags, ApiOperation, ApiResponse, ApiBearerAuth } from '@nestjs/swagger'
+import {
+  Controller,
+  Post,
+  Get,
+  Param,
+  Body,
+  UseGuards,
+  UseInterceptors,
+  UploadedFile,
+  ParseFilePipe,
+  MaxFileSizeValidator,
+  FileTypeValidator,
+  Res,
+} from '@nestjs/common'
+import { FileInterceptor } from '@nestjs/platform-express'
+import { ApiTags, ApiOperation, ApiResponse, ApiBearerAuth, ApiConsumes } from '@nestjs/swagger'
+import type { Response } from 'express'
 import { ClassesService } from './classes.service'
 import { CreateClassDto, ClassResponseDto } from './dto/class.dto'
 import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard'
@@ -42,5 +57,46 @@ export class ClassesController {
   @ApiResponse({ status: 200, type: ClassResponseDto })
   findOne(@Param('id') id: string) {
     return this.classesService.findById(id)
+  }
+
+  // ── Books ─────────────────────────────────────────────────────────────────
+
+  @Post(':id/books')
+  @Roles('TEACHER')
+  @ApiConsumes('multipart/form-data')
+  @ApiOperation({ summary: 'Enviar livro (PDF) para a turma' })
+  @UseInterceptors(FileInterceptor('file', { limits: { fileSize: 50 * 1024 * 1024 } }))
+  addBook(
+    @Param('id') id: string,
+    @Body('title') title: string,
+    @UploadedFile(
+      new ParseFilePipe({
+        validators: [
+          new MaxFileSizeValidator({ maxSize: 50 * 1024 * 1024 }),
+          new FileTypeValidator({ fileType: 'application/pdf' }),
+        ],
+      }),
+    )
+    file: Express.Multer.File,
+    @CurrentUser('sub') userId: string,
+  ) {
+    return this.classesService.addBook(id, userId, title || file.originalname, file)
+  }
+
+  @Get(':id/books')
+  @ApiOperation({ summary: 'Listar livros da turma' })
+  books(@Param('id') id: string, @CurrentUser('sub') userId: string) {
+    return this.classesService.findBooks(id, userId)
+  }
+
+  @Get(':id/books/:bookId/file')
+  @ApiOperation({ summary: 'Baixar o PDF de um livro da turma' })
+  async bookFile(
+    @Param('id') id: string,
+    @Param('bookId') bookId: string,
+    @CurrentUser('sub') userId: string,
+    @Res() res: Response,
+  ) {
+    res.sendFile(await this.classesService.getBookFile(id, bookId, userId))
   }
 }

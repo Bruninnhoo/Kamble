@@ -134,6 +134,7 @@ model Class {
   sessions    Session[]
   assignments Assignment[]
   payments    Payment[]
+  books       Book[]
 
   @@map("classes")
 }
@@ -180,6 +181,20 @@ model Session {
   createdAt    DateTime      @default(now())
 
   @@map("sessions")
+}
+
+// ─── Book ─────────────────────────────────────────────────────────────────────
+
+model Book {
+  id           String   @id @default(cuid())
+  title        String
+  filePath     String // relative to uploads/
+  classId      String? // null = school library (future)
+  class        Class?   @relation(fields: [classId], references: [id])
+  uploadedById String
+  createdAt    DateTime @default(now())
+
+  @@map("books")
 }
 
 // ─── Assignment ───────────────────────────────────────────────────────────────

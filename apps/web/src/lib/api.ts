@@ -193,11 +193,55 @@ export const sessionsApi = {
   byClass: (classId: string) =>
     authGet<SessionData[]>(`/api/v1/classes/${classId}/sessions`),
 
+  findById: (id: string) =>
+    authGet<SessionData>(`/api/v1/sessions/${id}`),
+
   start: (id: string) =>
     authPatch<SessionData>(`/api/v1/sessions/${id}/start`),
 
   end: (id: string) =>
     authPatch<SessionData>(`/api/v1/sessions/${id}/end`),
+}
+
+// ── Livros ─────────────────────────────────────────────────────────────────
+
+export interface BookData {
+  id: string
+  title: string
+  createdAt: string
+}
+
+export const booksApi = {
+  byClass: (classId: string) =>
+    authGet<BookData[]>(`/api/v1/classes/${classId}/books`),
+
+  upload: async (classId: string, file: File, title?: string) => {
+    const form = new FormData()
+    form.append('file', file)
+    if (title) form.append('title', title)
+    const token = getAccessToken()
+    const res = await fetch(`${BASE}/api/v1/classes/${classId}/books`, {
+      method: 'POST',
+      headers: token ? { Authorization: `Bearer ${token}` } : {},
+      body: form,
+    })
+    const data = await res.json()
+    if (!res.ok) {
+      const err = data as ApiError
+      throw new Error((Array.isArray(err.message) ? err.message[0] : err.message) ?? 'Erro inesperado')
+    }
+    return data as BookData
+  },
+
+  /** Fetches the PDF bytes with auth (the file route is not public). */
+  file: async (classId: string, bookId: string) => {
+    const token = getAccessToken()
+    const res = await fetch(`${BASE}/api/v1/classes/${classId}/books/${bookId}/file`, {
+      headers: token ? { Authorization: `Bearer ${token}` } : {},
+    })
+    if (!res.ok) throw new Error('Não foi possível carregar o livro')
+    return res.arrayBuffer()
+  },
 }
 
 // ── Endpoints de autenticação ──────────────────────────────────────────────
