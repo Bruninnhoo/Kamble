@@ -9,9 +9,7 @@ RUN corepack enable
 WORKDIR /repo
 COPY package.json pnpm-lock.yaml pnpm-workspace.yaml ./
 COPY apps/api/package.json apps/api/
-COPY packages/shared/package.json packages/shared/
-RUN pnpm install --frozen-lockfile --filter @kamble/api...
-COPY packages/shared packages/shared
+RUN pnpm install --frozen-lockfile --filter @kamble/api
 COPY apps/api apps/api
 RUN pnpm --filter @kamble/api exec prisma generate \
   && pnpm --filter @kamble/api build \
