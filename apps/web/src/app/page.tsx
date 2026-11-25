@@ -339,8 +339,7 @@ export default function HomePage() {
           </div>
 
           <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-3">
-            {levels.map((level, i) => {
-              const intensity = Math.round(10 + i * 8)
+            {levels.map((level) => {
               return (
                 <div
                   key={level.code}

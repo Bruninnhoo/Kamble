@@ -7,6 +7,7 @@ import { useWebRTC, RemotePeer, ChatMessage } from '@/lib/useWebRTC'
 import { useBook } from '@/lib/useBook'
 import { booksApi, sessionsApi, BookData } from '@/lib/api'
 import { BookViewer } from '@/components/BookViewer'
+import { useStored, useMediaQuery } from '@/lib/useStored'
 
 // ── Sub-components ────────────────────────────────────────────────────────────
 
@@ -187,27 +188,14 @@ export default function SessionRoomPage() {
   const router = useRouter()
   const sessionId = params.id as string
 
-  // In a real app these would come from a store/cookie
-  // Using localStorage as a simple approach for the demo
-  const [authToken, setAuthToken] = useState<string | null>(null)
-  const [userId, setUserId] = useState<string>('demo-user')
-  const [role, setRole] = useState<string>('STUDENT')
-  const [chatOpen, setChatOpen] = useState(false)
+  const authToken = useStored('kamble_access_token')
+  const userId = useStored('kamble_user_id') ?? ''
+  const role = useStored('kamble_user_role') ?? 'STUDENT'
+  // Chat starts open on desktop and closed on mobile, until the user toggles it
+  const isDesktop = useMediaQuery('(min-width: 768px)')
+  const [chatChoice, setChatChoice] = useState<boolean | null>(null)
+  const chatOpen = chatChoice ?? isDesktop
   const [isJoined, setIsJoined] = useState(false)
-
-  // Load token from localStorage on client
-  useEffect(() => {
-    if (typeof window !== 'undefined') {
-      const token = localStorage.getItem('kamble_access_token') ?? ''
-      const storedUserId = localStorage.getItem('kamble_user_id') ?? 'demo-user'
-      const storedRole = localStorage.getItem('kamble_user_role') ?? 'TEACHER'
-      setAuthToken(token)
-      setUserId(storedUserId)
-      setRole(storedRole)
-      // Chat starts open on desktop, as a closed drawer on mobile
-      setChatOpen(window.matchMedia('(min-width: 768px)').matches)
-    }
-  }, [])
 
   const socket = authToken ? getCallSocket(authToken) : null
 
@@ -228,7 +216,7 @@ export default function SessionRoomPage() {
     sendChatMessage,
     startSession,
     endSession,
-  } = useWebRTC({ socket, sessionId, userId, role })
+  } = useWebRTC({ socket, sessionId })
 
   const book = useBook(socket, sessionId)
   const isTeacher = role === 'TEACHER'
@@ -282,6 +270,8 @@ export default function SessionRoomPage() {
   // Auto-join when token is ready
   useEffect(() => {
     if (authToken && !isJoined) {
+      // ponytail: joins on page load; the preparation screen (task 7.1) replaces this with a button
+      // eslint-disable-next-line react-hooks/set-state-in-effect
       joinRoom()
     }
   }, [authToken]) // eslint-disable-line react-hooks/exhaustive-deps
@@ -517,7 +507,7 @@ export default function SessionRoomPage() {
 
             <ControlButton
               id="toggle-chat-btn"
-              onClick={() => setChatOpen((v) => !v)}
+              onClick={() => setChatChoice(!chatOpen)}
               active={chatOpen}
               title="Abrir/fechar chat"
             >
@@ -567,7 +557,7 @@ export default function SessionRoomPage() {
               messages={chatMessages}
               onSend={sendChatMessage}
               userId={userId}
-              onClose={() => setChatOpen(false)}
+              onClose={() => setChatChoice(false)}
             />
           </div>
         )}

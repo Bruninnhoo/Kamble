@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, FormEvent, useEffect, Suspense } from 'react'
+import { useState, FormEvent, Suspense } from 'react'
 import Link from 'next/link'
 import { useRouter, useSearchParams } from 'next/navigation'
 import { authApi, saveSession } from '@/lib/api'
@@ -25,12 +25,6 @@ function RegisterForm() {
   const [confirmPassword, setConfirmPassword] = useState('')
   const [error, setError] = useState<string | null>(null)
   const [loading, setLoading] = useState(false)
-
-  // Atualiza o papel se o query param mudar
-  useEffect(() => {
-    const r = searchParams.get('role')?.toUpperCase()
-    if (r === 'TEACHER' || r === 'STUDENT') setRole(r)
-  }, [searchParams])
 
   async function handleSubmit(e: FormEvent) {
     e.preventDefault()

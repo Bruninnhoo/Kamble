@@ -4,6 +4,7 @@ import Link from 'next/link'
 import { useRouter } from 'next/navigation'
 import { useEffect, useState } from 'react'
 import { clearSession, classesApi, ClassData } from '@/lib/api'
+import { useStored } from '@/lib/useStored'
 
 function getGreeting() {
   const hour = new Date().getHours()
@@ -14,26 +15,24 @@ function getGreeting() {
 
 export default function TeacherDashboard() {
   const router = useRouter()
-  const [userName, setUserName] = useState('')
+  const storedName = useStored('kamble_user_name')
+  const storedRole = useStored('kamble_user_role')
+  const userName = storedName ?? ''
   const [classes, setClasses] = useState<ClassData[]>([])
   const [loading, setLoading] = useState(true)
 
   useEffect(() => {
-    const name = localStorage.getItem('kamble_user_name')
-    const role = localStorage.getItem('kamble_user_role')
-
-    if (!name || role !== 'TEACHER') {
+    if (storedName === undefined) return
+    if (!storedName || storedRole !== 'TEACHER') {
       router.replace('/auth/login')
       return
     }
-
-    setUserName(name)
 
     classesApi.myClasses()
       .then(setClasses)
       .catch(() => setClasses([]))
       .finally(() => setLoading(false))
-  }, [router])
+  }, [router, storedName, storedRole])
 
   function handleLogout() {
     clearSession()

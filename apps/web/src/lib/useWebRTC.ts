@@ -27,11 +27,9 @@ export interface ChatMessage {
 interface UseWebRTCOptions {
   socket: Socket | null
   sessionId: string
-  userId: string
-  role: string
 }
 
-export function useWebRTC({ socket, sessionId, userId, role }: UseWebRTCOptions) {
+export function useWebRTC({ socket, sessionId }: UseWebRTCOptions) {
   const [localStream, setLocalStream] = useState<MediaStream | null>(null)
   const [peers, setPeers] = useState<Map<string, RemotePeer>>(new Map())
   const [chatMessages, setChatMessages] = useState<ChatMessage[]>([])
@@ -271,7 +269,7 @@ export function useWebRTC({ socket, sessionId, userId, role }: UseWebRTCOptions)
       socket.off('session-live', handleSessionLive)
       socket.off('session-finished', handleSessionFinished)
     }
-  }, [socket, callPeer, handleOffer, handleAnswer, handleIceCandidate]) // eslint-disable-line react-hooks/exhaustive-deps
+  }, [socket, callPeer, handleOffer, handleAnswer, handleIceCandidate])
 
   // ── Controls ──────────────────────────────────────────────────────────────
 

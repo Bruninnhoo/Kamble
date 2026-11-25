@@ -5,18 +5,18 @@ import { useParams } from 'next/navigation'
 import { useEffect, useState } from 'react'
 import { classesApi, booksApi, ClassData, BookData } from '@/lib/api'
 import { BookViewer } from '@/components/BookViewer'
+import { useStored } from '@/lib/useStored'
 
 export default function ClassPage() {
   const { id } = useParams<{ id: string }>()
   const [cls, setCls] = useState<ClassData | null>(null)
   const [books, setBooks] = useState<BookData[]>([])
-  const [role, setRole] = useState<string | null>(null)
+  const role = useStored('kamble_user_role')
   const [error, setError] = useState('')
   const [uploading, setUploading] = useState(false)
   const [open, setOpen] = useState<{ data: ArrayBuffer | null; page: number } | null>(null)
 
   useEffect(() => {
-    setRole(localStorage.getItem('kamble_user_role'))
     Promise.all([classesApi.findById(id), booksApi.byClass(id)])
       .then(([c, b]) => {
         setCls(c)
