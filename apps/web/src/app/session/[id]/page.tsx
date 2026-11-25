@@ -303,6 +303,7 @@ export default function SessionRoomPage() {
   useEffect(() => {
     return () => {
       cleanup()
+      disconnectCallSocket()
     }
   }, [cleanup])
 
