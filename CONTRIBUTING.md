@@ -42,19 +42,18 @@ Se a mensagem junta dois assuntos, provavelmente são dois commits.
 
 ## Verificação
 
-| Comando                               | O que confere                              |
-| ------------------------------------- | ------------------------------------------ |
-| `pnpm build`                          | Build dos apps                             |
-| `pnpm lint`                           | Lint, hoje com falhas conhecidas (Etapa 2) |
-| `pnpm --filter @kamble/api typecheck` | Tipos da API                               |
-| `pnpm --filter @kamble/web typecheck` | Tipos do web                               |
-| `pnpm --filter @kamble/api test`      | Testes da API                              |
+| Comando          | O que confere                              |
+| ---------------- | ------------------------------------------ |
+| `pnpm build`     | Build dos apps                             |
+| `pnpm lint`      | Lint, hoje com falhas conhecidas (Etapa 2) |
+| `pnpm typecheck` | Tipos de todos os pacotes                  |
+| `pnpm test`      | Testes da API                              |
 
 Regra de negócio, permissão ou validação nova leva um teste no mesmo commit.
 
 ## CI/CD
 
-Planejado para as etapas 1 e 4:
+O workflow é o [ci.yml](.github/workflows/ci.yml). O deploy entra na Etapa 4:
 
 | Momento         | O que roda                                             |
 | --------------- | ------------------------------------------------------ |

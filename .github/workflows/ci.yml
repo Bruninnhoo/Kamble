@@ -52,3 +52,25 @@ jobs:
       - run: pnpm test
       - run: pnpm build
       - run: docker build --file apps/api/Dockerfile .
+
+  publish:
+    needs: ci
+    if: github.event_name == 'push'
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    permissions:
+      contents: read
+      packages: write
+    env:
+      IMAGE: ghcr.io/bruninnhoo/kamble-api:${{ github.sha }}
+    steps:
+      - uses: actions/checkout@v7
+      - run: >-
+          docker build
+          --file apps/api/Dockerfile
+          --label org.opencontainers.image.source=https://github.com/${{ github.repository }}
+          --tag "$IMAGE" .
+      - run: echo "$GITHUB_TOKEN" | docker login ghcr.io --username "$GITHUB_ACTOR" --password-stdin
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      - run: docker push "$IMAGE"
