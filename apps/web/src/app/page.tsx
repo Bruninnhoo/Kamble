@@ -8,29 +8,29 @@ const features = [
     description: 'Participe de aulas interativas em tempo real com vídeo, chat e lousa compartilhada.',
   },
   {
-    icon: '🏆',
-    title: 'Professores Verificados',
-    description: 'Todos os professores passam por um processo rigoroso de verificação antes de entrar na plataforma.',
+    icon: '🖥️',
+    title: 'Tela Compartilhada',
+    description: 'O professor compartilha a tela e o áudio da aba, misturado ao microfone.',
   },
   {
     icon: '📚',
-    title: 'Material Didático',
-    description: 'Acesse PDFs, exercícios e gravações organizadas por aula, disponíveis a qualquer momento.',
+    title: 'Livro Sincronizado',
+    description: 'O professor troca a página do livro em PDF, e a turma inteira acompanha.',
   },
   {
     icon: '✏️',
     title: 'Lousa Interativa',
-    description: 'O professor pode chamar alunos para resolver exercícios na lousa digital durante a aula.',
+    description: 'O professor desenha sobre o livro e libera a caneta para um aluno participar.',
   },
   {
-    icon: '📊',
-    title: 'Acompanhamento',
-    description: 'Receba notas, feedbacks e acompanhe seu progresso ao longo das aulas.',
+    icon: '👥',
+    title: 'Turmas Pequenas',
+    description: 'Poucos alunos por aula, para todos terem espaço para falar.',
   },
   {
     icon: '📅',
-    title: 'Horários Flexíveis',
-    description: 'Escolha turmas com horários que se encaixam na sua rotina. Manhã, tarde ou noite.',
+    title: 'Aulas Agendadas',
+    description: 'O professor marca o horário e abre a sala quando a aula começa.',
   },
 ]
 
@@ -44,9 +44,9 @@ const levels = [
 ]
 
 const steps = [
-  { number: '01', title: 'Crie sua conta', description: 'Cadastro gratuito em menos de 2 minutos, sem cartão de crédito.' },
-  { number: '02', title: 'Teste seu nível', description: 'Avaliação rápida para encontrar a turma certa para você.' },
-  { number: '03', title: 'Entre ao vivo', description: 'Participe da sua primeira aula com professor real — de graça.' },
+  { number: '01', title: 'Crie sua conta', description: 'Escolha se você é professor ou aluno.' },
+  { number: '02', title: 'Entre em uma turma', description: 'O professor cria a turma, envia o livro e agenda as aulas.' },
+  { number: '03', title: 'Entre ao vivo', description: 'Participe da aula com vídeo, livro e lousa na mesma sala.' },
 ]
 
 function AppMockup() {
@@ -97,7 +97,7 @@ function AppMockup() {
                 <p className="text-[11px] text-zinc-200 font-medium">Miss Sarah</p>
               </div>
               <div className="absolute bottom-2 left-2 bg-black/60 backdrop-blur-sm rounded px-2 py-0.5 text-[10px] text-yellow-400 font-semibold">
-                Professora ✓
+                Professora
               </div>
               <div className="absolute top-2 right-2 bg-yellow-400/10 border border-yellow-400/25 rounded px-1.5 py-0.5 text-[10px] text-yellow-400">
                 🎤
@@ -201,7 +201,7 @@ export default function HomePage() {
             <div className="flex flex-col justify-center animate-fade-up">
               <div className="inline-flex items-center gap-2 glass rounded-full px-4 py-2 text-sm text-zinc-400 mb-8 w-fit">
                 <span className="text-yellow-400 text-base leading-none">✦</span>
-                Nova plataforma de inglês ao vivo
+                Sala de aula de inglês ao vivo
               </div>
 
               <h1 className="text-5xl md:text-6xl font-bold tracking-tight leading-[1.1] mb-6">
@@ -214,8 +214,8 @@ export default function HomePage() {
               </h1>
 
               <p className="text-lg text-zinc-400 leading-relaxed mb-10 max-w-md">
-                Turmas pequenas, aulas interativas e professores verificados.
-                Do iniciante ao fluente — no seu ritmo e horário.
+                Vídeo, chat, livro e lousa sincronizados entre professor e alunos,
+                direto no navegador.
               </p>
 
               <div className="flex flex-col sm:flex-row gap-3 mb-10">
@@ -223,7 +223,7 @@ export default function HomePage() {
                   href="/auth/register"
                   className="inline-flex items-center justify-center gap-2 bg-yellow-400 hover:bg-yellow-300 text-black font-bold px-8 py-4 rounded-xl transition-all duration-200 hover:scale-105 glow-brand text-base"
                 >
-                  Começar gratuitamente
+                  Criar conta
                   <span>→</span>
                 </Link>
                 <Link
@@ -235,7 +235,7 @@ export default function HomePage() {
               </div>
 
               <div className="flex flex-wrap gap-x-6 gap-y-2">
-                {['Sem mensalidade surpresa', 'Cancele quando quiser', 'Primeira aula grátis'].map((item) => (
+                {['Direto no navegador', 'Livro sincronizado', 'Lousa compartilhada'].map((item) => (
                   <div key={item} className="flex items-center gap-2 text-sm text-zinc-500">
                     <span className="text-yellow-400 font-bold">✓</span>
                     {item}
@@ -255,7 +255,7 @@ export default function HomePage() {
       {/* ── Divider strip ─────────────────────────────────────── */}
       <div className="border-y border-white/5 py-6 px-6 overflow-hidden">
         <div className="max-w-4xl mx-auto flex flex-wrap items-center justify-center gap-x-12 gap-y-3 text-sm text-zinc-600 font-medium">
-          {['Aulas ao vivo', 'Turmas pequenas', 'Professores verificados', 'Lousa digital', 'Chat em tempo real', 'Material incluso'].map((item) => (
+          {['Aulas ao vivo', 'Turmas pequenas', 'Livro em PDF', 'Lousa digital', 'Chat em tempo real', 'Tela compartilhada'].map((item) => (
             <span key={item} className="flex items-center gap-2">
               <span className="w-1 h-1 bg-yellow-400/60 rounded-full" />
               {item}
@@ -274,7 +274,7 @@ export default function HomePage() {
               <span className="gradient-text">aprender de verdade</span>
             </h2>
             <p className="text-zinc-400 max-w-lg mx-auto text-base">
-              Uma plataforma completa que vai além das aulas gravadas — aprenda ao vivo, com interação real.
+              Tudo o que a aula precisa em uma única sala, sem alternar entre janelas.
             </p>
           </div>
 
@@ -334,7 +334,7 @@ export default function HomePage() {
               <span className="gradient-text">todos os níveis</span>
             </h2>
             <p className="text-zinc-400 max-w-md mx-auto">
-              Fazemos uma avaliação inicial gratuita para encontrar a turma ideal para você.
+              Cada turma tem um nível definido pelo professor.
             </p>
           </div>
 
@@ -370,15 +370,14 @@ export default function HomePage() {
                 <span className="gradient-text">confiança</span>?
               </h2>
               <p className="text-zinc-400 mb-10 max-w-lg mx-auto leading-relaxed">
-                Crie sua conta, faça o teste de nível e entre na sua primeira aula ao vivo —{' '}
-                <strong className="text-white">totalmente de graça</strong>.
+                Crie sua conta, entre em uma turma e participe da aula ao vivo.
               </p>
               <div className="flex flex-col sm:flex-row gap-3 justify-center">
                 <Link
                   href="/auth/register"
                   className="inline-flex items-center justify-center gap-2 bg-yellow-400 hover:bg-yellow-300 text-black font-bold px-10 py-4 rounded-xl transition-all duration-300 hover:scale-105 text-base glow-brand"
                 >
-                  Criar conta gratuita →
+                  Criar conta →
                 </Link>
                 <Link
                   href="/auth/login"

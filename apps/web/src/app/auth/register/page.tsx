@@ -190,7 +190,7 @@ function RegisterForm() {
             Criando conta...
           </>
         ) : (
-          'Criar conta gratuita'
+          'Criar conta'
         )}
       </button>
 

@@ -51,19 +51,9 @@ export default function LoginPage() {
           </Link>
 
           <div>
-            <blockquote className="text-2xl font-light text-zinc-200 leading-relaxed mb-6">
-              &ldquo;Em 6 meses com a Kamble eu consegui passar na entrevista de emprego em inglês.
-              Os professores são incríveis.&rdquo;
-            </blockquote>
-            <div className="flex items-center gap-3">
-              <div className="w-10 h-10 rounded-full bg-gradient-to-br from-sky-400 to-lime-400 flex items-center justify-center text-black font-bold">
-                A
-              </div>
-              <div>
-                <div className="font-medium">Ana Souza</div>
-                <div className="text-sm text-zinc-500">Nível B2 · São Paulo</div>
-              </div>
-            </div>
+            <p className="text-2xl font-light text-zinc-200 leading-relaxed">
+              Vídeo, chat, livro e lousa na mesma sala de aula.
+            </p>
           </div>
         </div>
       </div>
@@ -164,7 +154,7 @@ export default function LoginPage() {
               id="go-to-register-link"
               className="text-sky-400 hover:text-sky-300 font-medium transition-colors"
             >
-              Criar conta grátis
+              Criar conta
             </Link>
           </p>
         </div>

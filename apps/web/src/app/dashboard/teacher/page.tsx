@@ -50,7 +50,6 @@ export default function TeacherDashboard() {
     { label: 'Turmas ativas', value: String(activeClasses), icon: '📚' },
     { label: 'Alunos', value: String(totalStudents), icon: '🎓' },
     { label: 'Total de turmas', value: String(classes.length), icon: '🏫' },
-    { label: 'Correções pendentes', value: '—', icon: '✏️' },
   ]
 
   return (
@@ -132,7 +131,7 @@ export default function TeacherDashboard() {
         </div>
 
         {/* Stats */}
-        <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
+        <div className="grid grid-cols-2 lg:grid-cols-3 gap-4 mb-8">
           {stats.map((stat) => (
             <div key={stat.label} className="glass rounded-2xl p-5">
               <div className="text-2xl mb-2">{stat.icon}</div>

@@ -45,8 +45,6 @@ export default function StudentDashboard() {
 
   const stats = [
     { label: 'Turmas matriculadas', value: String(classes.length), icon: '📚' },
-    { label: 'Tarefas entregues', value: '—', icon: '✅' },
-    { label: 'Horas estudadas', value: '—', icon: '⏱️' },
     { label: 'Nível atual', value: classes[0]?.level ?? '—', icon: '📊' },
   ]
 
@@ -114,11 +112,11 @@ export default function StudentDashboard() {
           <h1 className="text-2xl font-bold mb-1">
             {firstName ? `${getGreeting()}, ${firstName}! 👋` : ''}
           </h1>
-          <p className="text-zinc-500 text-sm">Aqui está o resumo das suas aulas e tarefas.</p>
+          <p className="text-zinc-500 text-sm">Aqui está o resumo das suas turmas.</p>
         </div>
 
         {/* Stats */}
-        <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
+        <div className="grid grid-cols-2 gap-4 mb-8">
           {stats.map((stat) => (
             <div key={stat.label} className="glass rounded-2xl p-5">
               <div className="text-2xl mb-2">{stat.icon}</div>
