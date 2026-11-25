@@ -2,6 +2,7 @@ import { Injectable, SetMetadata } from '@nestjs/common'
 import { Reflector } from '@nestjs/core'
 import { AuthGuard } from '@nestjs/passport'
 import { ExecutionContext, ForbiddenException } from '@nestjs/common'
+import { JwtPayload } from '../decorators/current-user.decorator'
 
 export const ROLES_KEY = 'roles'
 export const Roles = (...roles: string[]) => SetMetadata(ROLES_KEY, roles)
@@ -22,8 +23,8 @@ export class RolesGuard extends AuthGuard('jwt') {
 
     if (!requiredRoles || requiredRoles.length === 0) return true
 
-    const { user } = context.switchToHttp().getRequest()
-    if (!requiredRoles.includes(user?.role)) {
+    const { user } = context.switchToHttp().getRequest<{ user?: JwtPayload }>()
+    if (!requiredRoles.includes(user?.role ?? '')) {
       throw new ForbiddenException('Acesso negado: permissão insuficiente')
     }
 

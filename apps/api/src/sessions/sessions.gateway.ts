@@ -67,7 +67,7 @@ export class SessionsGateway implements OnGatewayConnection, OnGatewayDisconnect
 
   // ── Connection ────────────────────────────────────────────────────────────
 
-  async handleConnection(client: AuthenticatedSocket) {
+  handleConnection(client: AuthenticatedSocket) {
     try {
       const token =
         (client.handshake.auth?.token as string) ||
@@ -140,7 +140,7 @@ export class SessionsGateway implements OnGatewayConnection, OnGatewayDisconnect
   }
 
   @SubscribeMessage('leave-room')
-  async handleLeaveRoom(
+  handleLeaveRoom(
     @ConnectedSocket() client: AuthenticatedSocket,
     @MessageBody() data: { sessionId: string },
   ) {
@@ -289,7 +289,7 @@ export class SessionsGateway implements OnGatewayConnection, OnGatewayDisconnect
   // ── Private helpers ───────────────────────────────────────────────────────
 
   private _leaveRoom(client: AuthenticatedSocket, sessionId: string) {
-    client.leave(sessionId)
+    void client.leave(sessionId)
     const room = this.rooms.get(sessionId)
     if (room) {
       room.delete(client.id)
