@@ -1,5 +1,7 @@
 # Kamble
 
+[![CI](https://github.com/Bruninnhoo/Kamble/actions/workflows/ci.yml/badge.svg?branch=main)](https://github.com/Bruninnhoo/Kamble/actions/workflows/ci.yml)
+
 Sala de aula de inglês ao vivo no navegador: vídeo, chat, livro em PDF e lousa sincronizados entre professor e alunos.
 
 > Projeto de portfólio em desenvolvimento. Ainda não há versão publicada, e a sala ainda não foi testada de ponta a ponta.
@@ -19,7 +21,8 @@ Sala de aula de inglês ao vivo no navegador: vídeo, chat, livro em PDF e lousa
 | Agendamento, início e encerramento de aulas | Código escrito                                                                   |
 | Sala com vídeo, chat, livro e lousa         | Código escrito, com [problemas conhecidos](docs/HANDOFF.md#problemas-conhecidos) |
 | Convite, preparação e demo                  | Planejado                                                                        |
-| CI/CD e deploy                              | Planejado                                                                        |
+| CI, imagem da API e banco local             | Configurados                                                                     |
+| Deploy                                      | Planejado                                                                        |
 
 O que vem a seguir está no [roteiro](docs/ROTEIRO.md).
 
@@ -31,11 +34,12 @@ O que vem a seguir está no [roteiro](docs/ROTEIRO.md).
 | API       | NestJS 11, Prisma 6, Passport JWT, Socket.IO                   |
 | Banco     | PostgreSQL                                                     |
 | Monorepo  | Turborepo, pnpm                                                |
+| DevOps    | GitHub Actions, Docker, GHCR, Dependabot                       |
 | Linguagem | TypeScript                                                     |
 
 ## Rodar localmente
 
-Requisitos: Node.js 24, pnpm 9 e PostgreSQL.
+Requisitos: Node.js 24, pnpm 9 e Docker.
 
 **1. Instale as dependências**
 
@@ -43,23 +47,22 @@ Requisitos: Node.js 24, pnpm 9 e PostgreSQL.
 pnpm install
 ```
 
-**2. Crie `apps/api/.env`**
+**2. Crie os arquivos de ambiente**
 
-```env
-DATABASE_URL="postgresql://USUARIO:SENHA@localhost:5432/kamble"
-JWT_SECRET="troque-por-um-valor-aleatorio"
-JWT_REFRESH_SECRET="troque-por-outro-valor-aleatorio"
-PORT=3001
-FRONTEND_URL="http://localhost:3000"
+```bash
+cp apps/api/.env.example apps/api/.env
+cp apps/web/.env.example apps/web/.env.local
 ```
 
-Ajuste a porta 5432 se o seu PostgreSQL usar outra.
+Em `apps/api/.env`, troque os valores de `JWT_SECRET` e `JWT_REFRESH_SECRET`.
 
-**3. Crie `apps/web/.env.local`**
+**3. Suba o banco**
 
-```env
-NEXT_PUBLIC_API_URL="http://localhost:3001"
+```bash
+docker compose up -d --wait
 ```
+
+O banco usa a porta 5432, que precisa estar livre.
 
 **4. Prepare o banco**
 

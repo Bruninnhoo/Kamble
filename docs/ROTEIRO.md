@@ -2,18 +2,18 @@
 
 Cada etapa tem uma branch, um PR e um critério de pronto. Cada tarefa tem o tamanho de um commit. As regras de trabalho estão no [CONTRIBUTING](../CONTRIBUTING.md).
 
-| Etapa                  | Estado                         |
-| ---------------------- | ------------------------------ |
-| 0. Documentação        | Concluída com o merge deste PR |
-| 1. Git, CI/CD e DevOps | Próxima                        |
-| 2. Rodar e limpar      | Planejada                      |
-| 3. Segurança e sessão  | Planejada                      |
-| 4. Hospedagem e CD     | Planejada                      |
-| 5. Tela da turma       | Planejada                      |
-| 6. Convite             | Planejada                      |
-| 7. Preparação          | Planejada                      |
-| 8. Demo por visitante  | Planejada                      |
-| 9. Fechamento          | Planejada                      |
+| Etapa                  | Estado                                               |
+| ---------------------- | ---------------------------------------------------- |
+| 0. Documentação        | Concluída                                            |
+| 1. Git, CI/CD e DevOps | Falta confirmar a imagem no GHCR e proteger a `main` |
+| 2. Rodar e limpar      | Próxima                                              |
+| 3. Segurança e sessão  | Planejada                                            |
+| 4. Hospedagem e CD     | Planejada                                            |
+| 5. Tela da turma       | Planejada                                            |
+| 6. Convite             | Planejada                                            |
+| 7. Preparação          | Planejada                                            |
+| 8. Demo por visitante  | Planejada                                            |
+| 9. Fechamento          | Planejada                                            |
 
 ## Etapa 0: Documentação
 
@@ -31,22 +31,22 @@ Branch `docs/project-foundation`.
 
 ## Etapa 1: Git, CI/CD e DevOps
 
-Branch `chore/devops-foundation`. A lógica do app não muda.
+Branches `chore/devops-foundation`, `ci/delivery-pipeline` e `ci/publish-image`. A lógica do app não muda.
 
-- [ ] 1.1 `.gitattributes` com fim de linha LF
-- [ ] 1.2 `.nvmrc` com Node 24
-- [ ] 1.3 Remover `pnpm-lock.yaml.1778462830`
-- [ ] 1.4 `.env.example` nos dois apps, com exceção no `apps/web/.gitignore`, que hoje bloqueia `.env*`
-- [ ] 1.5 Scripts `typecheck` e `test` na raiz e tarefa `test` no Turborepo
-- [ ] 1.6 CI: instalação, typecheck, testes e build
-- [ ] 1.7 CI: migrations em um Postgres e divergência com o schema
-- [ ] 1.8 Dependabot mensal e agrupado
-- [ ] 1.9 Modelo de PR
-- [ ] 1.10 Postgres local com Docker Compose
-- [ ] 1.11 Imagem Docker da API
-- [ ] 1.12 CI: build da imagem
-- [ ] 1.13 Publicação da imagem no GHCR a partir da `main`
-- [ ] 1.14 Handoff e badge do CI
+- [x] 1.1 `.gitattributes` com fim de linha LF
+- [x] 1.2 `.nvmrc` com Node 24
+- [x] 1.3 Remover `pnpm-lock.yaml.1778462830`
+- [x] 1.4 `.env.example` nos dois apps, com exceção no `apps/web/.gitignore`, que hoje bloqueia `.env*`
+- [x] 1.5 Scripts `typecheck` e `test` na raiz e tarefa `test` no Turborepo
+- [x] 1.6 CI: instalação, typecheck, testes e build
+- [x] 1.7 CI: migrations em um Postgres e divergência com o schema
+- [x] 1.8 Dependabot mensal e agrupado
+- [x] 1.9 Modelo de PR
+- [x] 1.10 Postgres local com Docker Compose
+- [x] 1.11 Imagem Docker da API
+- [x] 1.12 CI: build da imagem
+- [x] 1.13 Publicação da imagem no GHCR a partir da `main`
+- [x] 1.14 Handoff e badge do CI
 - [ ] No GitHub, sem commit: regras da `main`, só merge commit, descrição e tópicos, alertas do Dependabot e CodeQL
 
 **Pronto quando:** o CI está verde, a `main` está protegida e a imagem está no GHCR.
@@ -55,7 +55,7 @@ Branch `chore/devops-foundation`. A lógica do app não muda.
 
 ## Etapa 2: Rodar e limpar
 
-- [ ] 2.1 Ajustar a porta do banco e aplicar as migrations (local, sem commit)
+- [ ] 2.1 Apontar o `.env` para o banco do Docker Compose e aplicar as migrations (local, sem commit)
 - [ ] 2.2 Corrigir a criação repetida de socket em `lib/socket.ts`
 - [ ] 2.3 Trocar o "Hello World" por `GET /health`, com teste
 - [ ] 2.4 Remover dependências e código sem uso
@@ -64,7 +64,8 @@ Branch `chore/devops-foundation`. A lógica do app não muda.
 - [ ] 2.7 Corrigir o lint da API
 - [ ] 2.8 Corrigir o lint do web
 - [ ] 2.9 Lint obrigatório no CI
-- [ ] 2.10 Handoff
+- [ ] 2.10 Investigar a falha do `pnpm install` no Windows
+- [ ] 2.11 Handoff
 
 **Pronto quando:** professor e aluno se conectam localmente, com a matrícula feita à mão no banco, e o CI exige lint.
 
@@ -91,7 +92,8 @@ Cada item leva o seu teste.
 - [ ] 4.3 Configurar ambiente e segredos no GitHub
 - [ ] 4.4 Deploy automático com migrations
 - [ ] 4.5 Testar o retorno a uma versão anterior
-- [ ] 4.6 Handoff
+- [ ] 4.6 Encerrar a API ao receber o sinal de parada e reduzir a imagem
+- [ ] 4.7 Handoff
 
 **Pronto quando:** um merge na `main` publica a nova versão, e `/health` responde.
 
