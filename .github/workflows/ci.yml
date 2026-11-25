@@ -51,3 +51,4 @@ jobs:
       - run: pnpm typecheck
       - run: pnpm test
       - run: pnpm build
+      - run: docker build --file apps/api/Dockerfile .
