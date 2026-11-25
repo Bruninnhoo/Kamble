@@ -1,0 +1,11 @@
+.git
+.github
+.claude
+docs
+**/node_modules
+**/dist
+**/.next
+**/.turbo
+**/.env*
+**/uploads
+**/*.tsbuildinfo

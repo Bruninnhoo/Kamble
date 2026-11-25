@@ -16,6 +16,22 @@ jobs:
   ci:
     runs-on: ubuntu-latest
     timeout-minutes: 15
+    services:
+      postgres:
+        image: postgres:18
+        env:
+          POSTGRES_USER: kamble
+          POSTGRES_PASSWORD: kamble
+          POSTGRES_DB: kamble
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd "pg_isready -U kamble"
+          --health-interval 5s
+          --health-timeout 5s
+          --health-retries 10
+    env:
+      DATABASE_URL: postgresql://kamble:kamble@localhost:5432/kamble
     steps:
       - uses: actions/checkout@v7
       - uses: pnpm/action-setup@v6
@@ -25,6 +41,14 @@ jobs:
           cache: pnpm
       - run: pnpm install --frozen-lockfile
       - run: pnpm --filter @kamble/api exec prisma generate
+      - run: pnpm --filter @kamble/api exec prisma migrate deploy
+      - name: Check schema drift
+        run: >-
+          pnpm --filter @kamble/api exec prisma migrate diff
+          --from-schema-datasource prisma/schema.prisma
+          --to-schema-datamodel prisma/schema.prisma
+          --exit-code
       - run: pnpm typecheck
       - run: pnpm test
       - run: pnpm build
+      - run: docker build --file apps/api/Dockerfile .
