@@ -13,11 +13,11 @@ export const metadata: Metadata = {
     template: '%s | Kamble',
   },
   description:
-    'Plataforma de ensino de inglês com aulas ao vivo, material didático e professores verificados. Aprenda no seu ritmo com turmas personalizadas.',
+    'Sala de aula de inglês ao vivo no navegador: vídeo, chat, livro em PDF e lousa sincronizados.',
   keywords: ['inglês', 'aulas de inglês', 'learn english', 'curso de inglês online'],
   openGraph: {
     title: 'Kamble — Aprenda inglês com professores ao vivo',
-    description: 'Plataforma de ensino de inglês com aulas ao vivo e professores verificados.',
+    description: 'Sala de aula de inglês ao vivo no navegador: vídeo, chat, livro em PDF e lousa sincronizados.',
     type: 'website',
     locale: 'pt_BR',
   },

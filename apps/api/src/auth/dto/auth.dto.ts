@@ -1,7 +1,7 @@
 import { IsEmail, IsEnum, IsString, MinLength } from 'class-validator'
 import { ApiProperty } from '@nestjs/swagger'
 
-enum RegisterRole {
+export enum RegisterRole {
   STUDENT = 'STUDENT',
   TEACHER = 'TEACHER',
 }

@@ -45,7 +45,7 @@ export default function Navbar() {
             href="/auth/register"
             className="text-sm bg-yellow-400 hover:bg-yellow-300 text-black font-bold px-4 py-2 rounded-lg transition-all duration-200 hover:scale-105"
           >
-            Começar grátis
+            Criar conta
           </Link>
         </div>
       </div>

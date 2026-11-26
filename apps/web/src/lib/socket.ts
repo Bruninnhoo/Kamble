@@ -7,7 +7,7 @@ const API_URL = process.env.NEXT_PUBLIC_API_URL ?? 'http://localhost:3001'
 let socket: Socket | null = null
 
 export function getCallSocket(token: string): Socket {
-  if (!socket || !socket.connected) {
+  if (!socket) {
     socket = io(`${API_URL}/calls`, {
       auth: { token },
       transports: ['websocket'],

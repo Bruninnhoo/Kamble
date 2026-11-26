@@ -4,6 +4,7 @@ import Link from 'next/link'
 import { useRouter, useParams } from 'next/navigation'
 import { useEffect, useState } from 'react'
 import { classesApi, sessionsApi, ClassData, SessionData } from '@/lib/api'
+import { useStored } from '@/lib/useStored'
 
 // ── Helpers ────────────────────────────────────────────────────────────────
 
@@ -214,16 +215,16 @@ export default function ClassSessionsPage() {
   const [sessions, setSessions] = useState<SessionData[]>([])
   const [loading, setLoading] = useState(true)
   const [showModal, setShowModal] = useState(false)
-  const [userName, setUserName] = useState('')
+  const storedName = useStored('kamble_user_name')
+  const storedRole = useStored('kamble_user_role')
+  const userName = storedName ?? ''
 
   useEffect(() => {
-    const name = localStorage.getItem('kamble_user_name') ?? ''
-    const role = localStorage.getItem('kamble_user_role')
-    if (!name || role !== 'TEACHER') {
+    if (storedName === undefined) return
+    if (!storedName || storedRole !== 'TEACHER') {
       router.replace('/auth/login')
       return
     }
-    setUserName(name)
 
     Promise.all([
       classesApi.findById(classId),
@@ -235,7 +236,7 @@ export default function ClassSessionsPage() {
       })
       .catch(() => router.replace('/dashboard/teacher'))
       .finally(() => setLoading(false))
-  }, [classId, router])
+  }, [classId, router, storedName, storedRole])
 
   function handleSessionCreated(newSession: SessionData) {
     setSessions((prev) =>

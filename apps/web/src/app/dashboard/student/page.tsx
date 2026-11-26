@@ -4,6 +4,7 @@ import Link from 'next/link'
 import { useRouter } from 'next/navigation'
 import { useEffect, useState } from 'react'
 import { clearSession, classesApi, ClassData } from '@/lib/api'
+import { useStored } from '@/lib/useStored'
 
 function getGreeting() {
   const hour = new Date().getHours()
@@ -14,26 +15,24 @@ function getGreeting() {
 
 export default function StudentDashboard() {
   const router = useRouter()
-  const [userName, setUserName] = useState('')
+  const storedName = useStored('kamble_user_name')
+  const storedRole = useStored('kamble_user_role')
+  const userName = storedName ?? ''
   const [classes, setClasses] = useState<ClassData[]>([])
   const [loading, setLoading] = useState(true)
 
   useEffect(() => {
-    const name = localStorage.getItem('kamble_user_name')
-    const role = localStorage.getItem('kamble_user_role')
-
-    if (!name || role !== 'STUDENT') {
+    if (storedName === undefined) return
+    if (!storedName || storedRole !== 'STUDENT') {
       router.replace('/auth/login')
       return
     }
-
-    setUserName(name)
 
     classesApi.enrolledClasses()
       .then(setClasses)
       .catch(() => setClasses([]))
       .finally(() => setLoading(false))
-  }, [router])
+  }, [router, storedName, storedRole])
 
   async function handleLogout() {
     clearSession()
@@ -45,8 +44,6 @@ export default function StudentDashboard() {
 
   const stats = [
     { label: 'Turmas matriculadas', value: String(classes.length), icon: '📚' },
-    { label: 'Tarefas entregues', value: '—', icon: '✅' },
-    { label: 'Horas estudadas', value: '—', icon: '⏱️' },
     { label: 'Nível atual', value: classes[0]?.level ?? '—', icon: '📊' },
   ]
 
@@ -114,11 +111,11 @@ export default function StudentDashboard() {
           <h1 className="text-2xl font-bold mb-1">
             {firstName ? `${getGreeting()}, ${firstName}! 👋` : ''}
           </h1>
-          <p className="text-zinc-500 text-sm">Aqui está o resumo das suas aulas e tarefas.</p>
+          <p className="text-zinc-500 text-sm">Aqui está o resumo das suas turmas.</p>
         </div>
 
         {/* Stats */}
-        <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
+        <div className="grid grid-cols-2 gap-4 mb-8">
           {stats.map((stat) => (
             <div key={stat.label} className="glass rounded-2xl p-5">
               <div className="text-2xl mb-2">{stat.icon}</div>

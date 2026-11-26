@@ -19,11 +19,10 @@ flowchart LR
 
 ## Monorepo
 
-| Caminho           | Conteúdo                                         |
-| ----------------- | ------------------------------------------------ |
-| `apps/api`        | NestJS 11, Prisma 6, Socket.IO                   |
-| `apps/web`        | Next.js 16, React 19, Tailwind 4, pdf.js         |
-| `packages/shared` | Tipos compartilhados; hoje nenhum app os importa |
+| Caminho    | Conteúdo                                 |
+| ---------- | ---------------------------------------- |
+| `apps/api` | NestJS 11, Prisma 6, Socket.IO           |
+| `apps/web` | Next.js 16, React 19, Tailwind 4, pdf.js |
 
 As tarefas são executadas com Turborepo e pnpm workspaces.
 

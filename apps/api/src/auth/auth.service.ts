@@ -6,7 +6,7 @@ import {
 import { JwtService } from '@nestjs/jwt'
 import { ConfigService } from '@nestjs/config'
 import { PrismaService } from '../prisma/prisma.service'
-import { LoginDto, RegisterDto } from './dto/auth.dto'
+import { LoginDto, RegisterDto, RegisterRole } from './dto/auth.dto'
 import * as bcrypt from 'bcryptjs'
 
 @Injectable()
@@ -29,8 +29,8 @@ export class AuthService {
         email: dto.email,
         password: hashed,
         role: dto.role,
-        ...(dto.role === 'STUDENT' ? { student: { create: {} } } : {}),
-        ...(dto.role === 'TEACHER' ? { teacher: { create: {} } } : {}),
+        ...(dto.role === RegisterRole.STUDENT ? { student: { create: {} } } : {}),
+        ...(dto.role === RegisterRole.TEACHER ? { teacher: { create: {} } } : {}),
       },
       select: { id: true, name: true, email: true, role: true, createdAt: true },
     })
