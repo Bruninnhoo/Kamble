@@ -6,7 +6,7 @@ Cada etapa tem uma branch, um PR e um critério de pronto. Cada tarefa tem o tam
 | ---------------------- | ---------------------------------- |
 | 0. Documentação        | Concluída                          |
 | 1. Git, CI/CD e DevOps | Concluída                          |
-| 2. Rodar e limpar      | Falta o teste da sala no navegador |
+| 2. Rodar e limpar      | Concluída                          |
 | 3. Segurança e sessão  | Próxima                            |
 | 4. Hospedagem e CD     | Planejada                          |
 | 5. Tela da turma       | Planejada                          |

@@ -4,21 +4,15 @@ Atualizado em 26/11/2026, ao fim da Etapa 2. Ao retomar o projeto, comece por aq
 
 ## Onde paramos
 
-O app roda localmente com o banco do Docker Compose. Pela API, o fluxo foi confirmado: cadastro, login, turma, aula e matrícula feita à mão no banco. O lint passa nos dois apps, e o CI agora exige lint. Na sala, a parte do servidor funciona: entrada, chat e repasse da sinalização WebRTC entre professor e aluno. O vídeo e a tela ainda não foram testados no navegador.
+O app roda localmente com o banco do Docker Compose. Pela API, o fluxo foi confirmado: cadastro, login, turma, aula e matrícula feita à mão no banco. O lint passa nos dois apps, e o CI agora exige lint. Professor e aluno se conectam na sala, no navegador.
 
 ## Antes da Etapa 3
 
-1. Teste a sala no navegador, conforme o passo a passo abaixo. Se falhar, a correção entra na branch `fix/local-run`, antes do PR.
-2. Abra o PR de `fix/local-run` para a `main` e faça o merge depois do CI verde.
+Abra o PR de `fix/local-run` para a `main` e faça o merge depois do CI verde.
 
-### Teste da sala
+### Dados de teste
 
-Já existem no banco local um professor (`prof@kamble.test`), um aluno (`aluno@kamble.test`), ambos com a senha `senha1234`, e a "Turma Teste", com uma aula agendada e o aluno matriculado.
-
-1. Rode `docker compose up -d --wait` e depois `pnpm dev`.
-2. Numa janela normal, entre como professor, abra Turma Teste → Aulas e entre na aula.
-3. Numa janela anônima, entre como aluno e abra a mesma URL `/session/<id>`. Ainda não há botão para o aluno (5.4).
-4. Confira se o vídeo e o áudio aparecem nos dois lados e se o chat funciona.
+O banco local tem um professor (`prof@kamble.test`), um aluno (`aluno@kamble.test`), ambos com a senha `senha1234`, e a "Turma Teste", com uma aula agendada e o aluno matriculado. Para entrar na sala como aluno, abra numa janela anônima a URL `/session/<id>` da aula, porque ainda não há botão (5.4).
 
 ## Próxima tarefa
 
@@ -37,7 +31,7 @@ Já existem no banco local um professor (`prof@kamble.test`), um aluno (`aluno@k
 | API local com curl     | `/health`, cadastro, login, criação de turma e de aula; o aluno matriculado vê a turma        |
 | `pnpm install` do zero | Passa no Windows, também com o store do pnpm vazio; depois dele é preciso `prisma generate`   |
 | Sala pelo socket       | Dois clientes Node entram na mesma aula, se veem, trocam chat e repassam a oferta WebRTC      |
-| Sala no navegador      | Não testada: falta vídeo, áudio e a tela                                                      |
+| Sala no navegador      | Funciona: professor e aluno conectados, testado à mão pelo autor                              |
 | Teste e2e              | Não executado                                                                                 |
 
 ## Ambiente
