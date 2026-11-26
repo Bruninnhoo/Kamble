@@ -2,18 +2,18 @@
 
 Cada etapa tem uma branch, um PR e um critério de pronto. Cada tarefa tem o tamanho de um commit. As regras de trabalho estão no [CONTRIBUTING](../CONTRIBUTING.md).
 
-| Etapa                  | Estado                                               |
-| ---------------------- | ---------------------------------------------------- |
-| 0. Documentação        | Concluída                                            |
-| 1. Git, CI/CD e DevOps | Falta confirmar a imagem no GHCR e proteger a `main` |
-| 2. Rodar e limpar      | Próxima                                              |
-| 3. Segurança e sessão  | Planejada                                            |
-| 4. Hospedagem e CD     | Planejada                                            |
-| 5. Tela da turma       | Planejada                                            |
-| 6. Convite             | Planejada                                            |
-| 7. Preparação          | Planejada                                            |
-| 8. Demo por visitante  | Planejada                                            |
-| 9. Fechamento          | Planejada                                            |
+| Etapa                  | Estado                             |
+| ---------------------- | ---------------------------------- |
+| 0. Documentação        | Concluída                          |
+| 1. Git, CI/CD e DevOps | Concluída                          |
+| 2. Rodar e limpar      | Falta o teste da sala no navegador |
+| 3. Segurança e sessão  | Próxima                            |
+| 4. Hospedagem e CD     | Planejada                          |
+| 5. Tela da turma       | Planejada                          |
+| 6. Convite             | Planejada                          |
+| 7. Preparação          | Planejada                          |
+| 8. Demo por visitante  | Planejada                          |
+| 9. Fechamento          | Planejada                          |
 
 ## Etapa 0: Documentação
 
@@ -47,7 +47,7 @@ Branches `chore/devops-foundation`, `ci/delivery-pipeline` e `ci/publish-image`.
 - [x] 1.12 CI: build da imagem
 - [x] 1.13 Publicação da imagem no GHCR a partir da `main`
 - [x] 1.14 Handoff e badge do CI
-- [ ] No GitHub, sem commit: regras da `main`, só merge commit, descrição e tópicos, alertas do Dependabot e CodeQL
+- [x] No GitHub, sem commit: regras da `main`, só merge commit, descrição e tópicos, alertas do Dependabot e CodeQL
 
 **Pronto quando:** o CI está verde, a `main` está protegida e a imagem está no GHCR.
 
@@ -55,17 +55,17 @@ Branches `chore/devops-foundation`, `ci/delivery-pipeline` e `ci/publish-image`.
 
 ## Etapa 2: Rodar e limpar
 
-- [ ] 2.1 Apontar o `.env` para o banco do Docker Compose e aplicar as migrations (local, sem commit)
-- [ ] 2.2 Corrigir a criação repetida de socket em `lib/socket.ts`
-- [ ] 2.3 Trocar o "Hello World" por `GET /health`, com teste
-- [ ] 2.4 Remover dependências e código sem uso
-- [ ] 2.5 Trocar os READMEs padrão dos apps
-- [ ] 2.6 Remover o depoimento fictício e as promessas fora do escopo
-- [ ] 2.7 Corrigir o lint da API
-- [ ] 2.8 Corrigir o lint do web
-- [ ] 2.9 Lint obrigatório no CI
-- [ ] 2.10 Investigar a falha do `pnpm install` no Windows
-- [ ] 2.11 Handoff
+- [x] 2.1 Apontar o `.env` para o banco do Docker Compose e aplicar as migrations (local, sem commit)
+- [x] 2.2 Corrigir a criação repetida de socket em `lib/socket.ts`
+- [x] 2.3 Trocar o "Hello World" por `GET /health`, com teste
+- [x] 2.4 Remover dependências e código sem uso
+- [x] 2.5 Trocar os READMEs padrão dos apps
+- [x] 2.6 Remover o depoimento fictício e as promessas fora do escopo
+- [x] 2.7 Corrigir o lint da API
+- [x] 2.8 Corrigir o lint do web
+- [x] 2.9 Lint obrigatório no CI
+- [x] 2.10 Investigar a falha do `pnpm install` no Windows
+- [x] 2.11 Handoff
 
 **Pronto quando:** professor e aluno se conectam localmente, com a matrícula feita à mão no banco, e o CI exige lint.
 
